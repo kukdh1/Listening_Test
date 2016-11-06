@@ -10,4 +10,8 @@ GeneratedFiles/
 release/
 debug/
 xcshareddata/
+*.stash
+*.plist
+*.pbxproj
+*.mak
 
