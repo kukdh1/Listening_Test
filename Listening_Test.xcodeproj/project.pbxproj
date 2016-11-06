@@ -25,8 +25,10 @@
 		20C424F3E6013174FBB26D6D /* QtWidgets.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = F347530E472E1A3B27BA209A /* QtWidgets.framework */; };
 		2947E4E156B21ADBBA361648 /* moc_MainWindow.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 4ED24D98AB081983D0B74823 /* moc_MainWindow.cpp */; settings = {ATTRIBUTES = (); }; };
 		44B9CC1EEB67DE9D19A79EAC /* QtCore.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 987F121AA98C1F6A1E2C2993 /* QtCore.framework */; };
+		674F2F531DCF34D900185394 /* libxlsxwriter.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 674F2F521DCF34D900185394 /* libxlsxwriter.dylib */; };
+		674F2F551DCF34E600185394 /* libxlsxwriter.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 674F2F521DCF34D900185394 /* libxlsxwriter.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		674F2F561DCF34E600185394 /* libfmod.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		677BC07C1DCEF95E006B21A7 /* libfmod.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; };
-		677BC0801DCEF9A1006B21A7 /* libxlsxwriter.a in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 677BC07F1DCEF9A0006B21A7 /* libxlsxwriter.a */; };
 		6FE9296E90F2FCE9ABAE1D41 /* QtGui.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D696AF494C6046611405F9BF /* QtGui.framework */; };
 		8771A8C96E9C391044035D99 /* OpenGL.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D4B32C2222F82AC56BADEB21 /* OpenGL.framework */; };
 		8D267F2E4776F0ECA2F49DC8 /* IOKit.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = A1A67BEAA744704B29168D39 /* IOKit.framework */; };
@@ -49,6 +51,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		674F2F541DCF34DD00185394 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				674F2F551DCF34E600185394 /* libxlsxwriter.dylib in CopyFiles */,
+				674F2F561DCF34E600185394 /* libfmod.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00BE8AC05C2DC93328D1F93C /* MainWindow.qrc */ = {isa = PBXFileReference; lastKnownFileType = text; name = MainWindow.qrc; path = /Users/kukdh1/Documents/Xcode/Listening_Test/MainWindow.qrc; sourceTree = "<absolute>"; };
 		16E30B96F83F84BC56480E9A /* MainWindow.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; name = MainWindow.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/MainWindow.cpp; sourceTree = "<absolute>"; tabWidth = 2; };
@@ -56,8 +72,8 @@
 		2B774D8E4178765CE52EAAF5 /* DiskArbitration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiskArbitration.framework; path = /System/Library/Frameworks/DiskArbitration.framework; sourceTree = "<absolute>"; };
 		4ED24D98AB081983D0B74823 /* moc_MainWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = moc_MainWindow.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/GeneratedFiles/release/moc_MainWindow.cpp; sourceTree = "<absolute>"; };
 		5B700EA82448FBAEF238E540 /* Audio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Audio.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/Audio.cpp; sourceTree = "<absolute>"; };
+		674F2F521DCF34D900185394 /* libxlsxwriter.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxlsxwriter.dylib; path = ../../git/libxlsxwriter/lib/libxlsxwriter.dylib; sourceTree = "<group>"; };
 		677BC07B1DCEF95E006B21A7 /* libfmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfmod.dylib; path = ../../fmod/osx/lib/libfmod.dylib; sourceTree = "<group>"; };
-		677BC07F1DCEF9A0006B21A7 /* libxlsxwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libxlsxwriter.a; path = ../../git/libxlsxwriter/lib/libxlsxwriter.a; sourceTree = "<group>"; };
 		6C17577E521F546B99D0E72D /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/MainWindow.h; sourceTree = "<absolute>"; };
 		7F3C09085CF46E18723703E4 /* ui_Progress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ui_Progress.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/GeneratedFiles/ui_Progress.h; sourceTree = "<absolute>"; };
 		82AB31B40D1C74974E6A7CB8 /* .qmake.stash */ = {isa = PBXFileReference; lastKnownFileType = text; name = .qmake.stash; path = /Users/kukdh1/Documents/Xcode/Listening_Test/.qmake.stash; sourceTree = "<absolute>"; };
@@ -87,10 +103,10 @@
 				20C424F3E6013174FBB26D6D /* QtWidgets.framework in Link Binary With Libraries */,
 				6FE9296E90F2FCE9ABAE1D41 /* QtGui.framework in Link Binary With Libraries */,
 				44B9CC1EEB67DE9D19A79EAC /* QtCore.framework in Link Binary With Libraries */,
-				677BC0801DCEF9A1006B21A7 /* libxlsxwriter.a in Link Binary With Libraries */,
 				A99B2AA0F9CBBDD12BA126A4 /* DiskArbitration.framework in Link Binary With Libraries */,
 				677BC07C1DCEF95E006B21A7 /* libfmod.dylib in Link Binary With Libraries */,
 				8D267F2E4776F0ECA2F49DC8 /* IOKit.framework in Link Binary With Libraries */,
+				674F2F531DCF34D900185394 /* libxlsxwriter.dylib in Link Binary With Libraries */,
 				8771A8C96E9C391044035D99 /* OpenGL.framework in Link Binary With Libraries */,
 				E45E51A644D5FC9F942ECE55 /* AGL.framework in Link Binary With Libraries */,
 			);
@@ -185,7 +201,7 @@
 		E8C543AB96796ECAA2E65C57 /* Listening_Test */ = {
 			isa = PBXGroup;
 			children = (
-				677BC07F1DCEF9A0006B21A7 /* libxlsxwriter.a */,
+				674F2F521DCF34D900185394 /* libxlsxwriter.dylib */,
 				677BC07B1DCEF95E006B21A7 /* libfmod.dylib */,
 				2EB56BE3C2D93CDAB0C52E67 /* Sources */,
 				25B08E2869634E9BCBA333A2 /* Generated Sources */,
@@ -217,6 +233,8 @@
 				D1C883685E82D5676953459A /* Link Binary With Libraries */,
 				9C316F444A62BF296E3E1F25 /* Project Copy */,
 				30414803F31797EB689AE508 /* Copy Bundle Resources */,
+				674F2F541DCF34DD00185394 /* CopyFiles */,
+				674F2F571DCF34EA00185394 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -276,6 +294,19 @@
 			shellPath = /bin/sh;
 			shellScript = "make -C /Users/kukdh1/Documents/Xcode/Listening_Test/ -f Listening_Test.xcodeproj/qt_makeqmake.mak";
 			showEnvVarsInLog = 0;
+		};
+		674F2F571DCF34EA00185394 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "install_name_tool -id @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks/libxlsxwriter.dylib\"\ninstall_name_tool -id @executable_path/../Frameworks/libfmod.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks/libfmod.dylib\"\ninstall_name_tool -change /usr/lib/libxlsxwriter.dylib @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/Listening_Test\"\ninstall_name_tool -change @rpath/libfmod.dylib @executable_path/../Frameworks/libfmod.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/Listening_Test\"";
 		};
 		7EF0942E79C014DCEC8976BC /* Qt Preprocessors */ = {
 			isa = PBXShellScriptBuildPhase;
