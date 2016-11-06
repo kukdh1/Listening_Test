@@ -41,12 +41,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\local\libxlsxwriter-0.4.2\lib;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\local\libxlsxwriter-0.4.2\lib;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
