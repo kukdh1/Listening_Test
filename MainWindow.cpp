@@ -210,7 +210,7 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui.saveResultButton, &QPushButton::clicked, [&]() {
     QString filter = "Microsoft Excel (*.xlsx)";
-    QString path = QFileDialog::getSaveFileName(parent, QString(), QString(), filter, &filter);
+    QString path = QFileDialog::getSaveFileName(NULL, QString(), "result.xlsx", filter, &filter);
 
     if (path.length() > 0) {
       resultModel.saveList(path);
