@@ -215,7 +215,7 @@ void ResultModel::appendResult(Result & result) {
 }
 
 void ResultModel::resetList() {
-  beginRemoveRows(QModelIndex{}, 0, vResults.size());
+  beginRemoveRows(QModelIndex{}, 0, vResults.size() - 1);
   vResults.clear();
   endRemoveRows();
 }
