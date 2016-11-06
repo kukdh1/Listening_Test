@@ -29,6 +29,7 @@
 		674F2F551DCF34E600185394 /* libxlsxwriter.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 674F2F521DCF34D900185394 /* libxlsxwriter.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		674F2F561DCF34E600185394 /* libfmod.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		677BC07C1DCEF95E006B21A7 /* libfmod.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; };
+		679164811DCF36BF00E0CBA8 /* Images.xcassets in Copy Bundle Resources */ = {isa = PBXBuildFile; fileRef = 679164801DCF36BF00E0CBA8 /* Images.xcassets */; };
 		6FE9296E90F2FCE9ABAE1D41 /* QtGui.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D696AF494C6046611405F9BF /* QtGui.framework */; };
 		8771A8C96E9C391044035D99 /* OpenGL.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D4B32C2222F82AC56BADEB21 /* OpenGL.framework */; };
 		8D267F2E4776F0ECA2F49DC8 /* IOKit.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = A1A67BEAA744704B29168D39 /* IOKit.framework */; };
@@ -74,6 +75,7 @@
 		5B700EA82448FBAEF238E540 /* Audio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Audio.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/Audio.cpp; sourceTree = "<absolute>"; };
 		674F2F521DCF34D900185394 /* libxlsxwriter.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxlsxwriter.dylib; path = ../../git/libxlsxwriter/lib/libxlsxwriter.dylib; sourceTree = "<group>"; };
 		677BC07B1DCEF95E006B21A7 /* libfmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfmod.dylib; path = ../../fmod/osx/lib/libfmod.dylib; sourceTree = "<group>"; };
+		679164801DCF36BF00E0CBA8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Listening_Test/Images.xcassets; sourceTree = "<group>"; };
 		6C17577E521F546B99D0E72D /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/MainWindow.h; sourceTree = "<absolute>"; };
 		7F3C09085CF46E18723703E4 /* ui_Progress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ui_Progress.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/GeneratedFiles/ui_Progress.h; sourceTree = "<absolute>"; };
 		82AB31B40D1C74974E6A7CB8 /* .qmake.stash */ = {isa = PBXFileReference; lastKnownFileType = text; name = .qmake.stash; path = /Users/kukdh1/Documents/Xcode/Listening_Test/.qmake.stash; sourceTree = "<absolute>"; };
@@ -160,6 +162,7 @@
 		87DF60DE337FB58864343E39 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				679164801DCF36BF00E0CBA8 /* Images.xcassets */,
 				00BE8AC05C2DC93328D1F93C /* MainWindow.qrc */,
 			);
 			name = Resources;
@@ -277,6 +280,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				679164811DCF36BF00E0CBA8 /* Images.xcassets in Copy Bundle Resources */,
 			);
 			name = "Copy Bundle Resources";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -524,6 +528,7 @@
 		6666AA5E688052234F6758D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COPY_PHASE_STRIP = YES;
 				ENABLE_BITCODE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -558,6 +563,7 @@
 		77418F46922677BB04ED38DD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_BITCODE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
