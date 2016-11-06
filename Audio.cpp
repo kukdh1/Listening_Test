@@ -43,7 +43,15 @@ FMOD_RESULT AudioSystem::createSound(std::string &buffer, uint32_t freq, uint8_t
 }
 
 FMOD_RESULT AudioSystem::playSound(FMOD::Sound *sound, FMOD::Channel **out) {
-  return system->playSound(sound, NULL, true, out);
+  FMOD_RESULT result;
+
+  result = system->playSound(sound, NULL, true, out);
+
+  if (result == FMOD_OK) {
+    (*out)->setVolume(0.5f);
+  }
+
+  return result;
 }
 
 FMOD_RESULT AudioSystem::update() {
