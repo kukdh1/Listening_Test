@@ -59,17 +59,19 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
   connect(ui.addFilebutton, &QPushButton::clicked, [&]() {
-    QString path = QFileDialog::getOpenFileName();
+    QStringList pathlist = QFileDialog::getOpenFileNames();
     
-    if (path.length() > 0) {
-      uint32_t samplerate;
-      uint8_t bitdepth;
-      std::string stdpath = path.toStdString();
-
-      if (audio.getInfo(stdpath, samplerate, bitdepth) == FMOD_OK) {
-        Song song(path, samplerate, bitdepth);
-
-        songModel.appendSong(song);
+    if (pathlist.length() > 0) {
+      for (auto path : pathlist) {
+        uint32_t samplerate;
+        uint8_t bitdepth;
+        std::string stdpath = path.toStdString();
+        
+        if (audio.getInfo(stdpath, samplerate, bitdepth) == FMOD_OK) {
+          Song song(path, samplerate, bitdepth);
+          
+          songModel.appendSong(song);
+        }
       }
     }
   });
@@ -207,7 +209,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
   connect(ui.saveResultButton, &QPushButton::clicked, [&]() {
-    QString path = QFileDialog::getSaveFileName();
+    QString filter = "Microsoft Excel (*.xlsx)";
+    QString path = QFileDialog::getSaveFileName(parent, QString(), QString(), filter, &filter);
 
     if (path.length() > 0) {
       resultModel.saveList(path);
