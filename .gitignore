@@ -1,18 +1,13 @@
 .vs
-
 Debug/
-
 Release/
-
 x64/
-
 Win32/
-
 Resources/
-
 GeneratedFiles/
-
 *.db
-
 *.Opendb
+release/
+debug/
+xcshareddata/
 
