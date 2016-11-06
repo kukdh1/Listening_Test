@@ -87,7 +87,7 @@
       <x>10</x>
       <y>250</y>
       <width>381</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -275,7 +275,7 @@
       <x>400</x>
       <y>250</y>
       <width>381</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
