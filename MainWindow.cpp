@@ -157,8 +157,11 @@ MainWindow::MainWindow(QWidget *parent)
       Result item(filename, test ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, result);
 
       resultModel.appendResult(item);
-
+      
+      ui.timeSlider->setEnabled(false);
+      ui.playButton_1->setEnabled(false);
       ui.selectSongButton_1->setEnabled(false);
+      ui.playButton_2->setEnabled(false);
       ui.selectSongButton_2->setEnabled(false);
     }
   });
@@ -196,9 +199,11 @@ MainWindow::MainWindow(QWidget *parent)
 
       resultModel.appendResult(item);
 
-      ui.selectSongButton_1->setEnabled(false);
-      ui.selectSongButton_2->setEnabled(false);
       ui.timeSlider->setEnabled(false);
+      ui.playButton_1->setEnabled(false);
+      ui.selectSongButton_1->setEnabled(false);
+      ui.playButton_2->setEnabled(false);
+      ui.selectSongButton_2->setEnabled(false);
     }
   });
   connect(ui.saveResultButton, &QPushButton::clicked, [&]() {
@@ -216,9 +221,17 @@ MainWindow::MainWindow(QWidget *parent)
       ui.deleteFileButton->setEnabled(false);
       ui.testSamplingRateButton->setEnabled(false);
       ui.testBitDepthButton->setEnabled(false);
+      ui.playButton_1->setEnabled(false);
+      ui.stopButton_1->setEnabled(false);
+      ui.selectSongButton_1->setEnabled(false);
+      ui.playButton_2->setEnabled(false);
+      ui.stopButton_2->setEnabled(false);
+      ui.selectSongButton_2->setEnabled(false);
     }
     else {
       ui.deleteFileButton->setEnabled(true);
+      ui.testSamplingRateButton->setEnabled(false);
+      ui.testBitDepthButton->setEnabled(false);
 
       SAFE_DELETE(session);
 
