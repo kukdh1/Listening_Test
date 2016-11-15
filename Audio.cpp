@@ -44,6 +44,7 @@ bool AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bi
     }
 
     avformat_close_input(&avf_context);
+    avformat_free_context(avf_context);
   }
 
   return result;
@@ -65,6 +66,7 @@ SongSession::SongSession(AudioSystem *_pSystem) {
 SongSession::~SongSession() {
   if (avf_context) {
     avformat_close_input(&avf_context);
+    avformat_free_context(avf_context);
   }
   if (current_stream) {
     Pa_StopStream(current_stream);
@@ -174,17 +176,35 @@ bool SongSession::readSound() {
         goto READ_SOUND_CLEANUP;
       }
 
-      av_init_packet(&packet);
       frame = av_frame_alloc();
 
       packet.data = (uint8_t *)buffer.c_str();
       packet.size = buffer.size();
       
       int len;
-      int frame_ptr = 0;
-      while (av_read_frame(avf_context, &packet) >= 0) {
+      int frame_ptr;
+      while (true) {
+        av_init_packet(&packet);
+
+        if (av_read_frame(avf_context, &packet) < 0) {
+          break;
+        }
+
         if (packet.stream_index == stream_id) {
-          len = avcodec_decode_audio4(ctx, frame, &frame_ptr, &packet);
+          frame_ptr = 0;
+
+          if (avcodec_send_packet(ctx, &packet) < 0) {
+            break;
+          }
+
+          len = avcodec_receive_frame(ctx, frame);
+
+          if (len < 0 && len != AVERROR(EAGAIN) && len != AVERROR_EOF) {
+            break;
+          }
+          if (len >= 0) {
+            frame_ptr = 1;
+          }
 
           if (frame_ptr) {
             // libavcodec provide 32bit sample for 24bit audio
@@ -196,12 +216,15 @@ bool SongSession::readSound() {
               memcpy((char *)data->c_str() + beginidx + i * 3, frame->extended_data[0] + i * 4 + 1, 3);
             }
           }
+
+          av_frame_unref(frame);
         }
+
+        av_free_packet(&packet);  // av_init_packet
       }
 
-      avcodec_close(ctx);
-      av_free_packet(&packet);
-      av_frame_free(&frame);
+      av_frame_free(&frame);    // av_frame_alloc
+      avcodec_close(ctx);       // avcodec_open2
     }
     else {
       goto READ_SOUND_CLEANUP;
@@ -211,7 +234,8 @@ bool SongSession::readSound() {
   }
 
 READ_SOUND_CLEANUP:
-  avformat_close_input(&avf_context);
+  avformat_close_input(&avf_context);   // avformat_open_input
+  avformat_free_context(avf_context);   // avformat_alloc_context
 
   return result;
 }
