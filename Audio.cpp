@@ -66,6 +66,10 @@ SongSession::~SongSession() {
   if (avf_context) {
     avformat_close_input(&avf_context);
   }
+  if (current_stream) {
+    Pa_StopStream(current_stream);
+    Pa_CloseStream(current_stream);
+  }
 }
 
 void SongSession::sineWaveTest() {
@@ -93,6 +97,7 @@ void SongSession::sineWaveTest() {
     Pa_Sleep(1000);
     Pa_StopStream(current_stream);
     Pa_CloseStream(current_stream);
+    current_stream = NULL;
   }
 }
 
@@ -174,7 +179,7 @@ bool SongSession::readSound() {
 
       packet.data = (uint8_t *)buffer.c_str();
       packet.size = buffer.size();
-
+      
       int len;
       int frame_ptr = 0;
       while (av_read_frame(avf_context, &packet) >= 0) {
@@ -194,6 +199,8 @@ bool SongSession::readSound() {
         }
       }
 
+      avcodec_close(ctx);
+      av_free_packet(&packet);
       av_frame_free(&frame);
     }
     else {
