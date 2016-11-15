@@ -27,9 +27,12 @@
 		44B9CC1EEB67DE9D19A79EAC /* QtCore.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 987F121AA98C1F6A1E2C2993 /* QtCore.framework */; };
 		674F2F531DCF34D900185394 /* libxlsxwriter.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 674F2F521DCF34D900185394 /* libxlsxwriter.dylib */; };
 		674F2F551DCF34E600185394 /* libxlsxwriter.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 674F2F521DCF34D900185394 /* libxlsxwriter.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		674F2F561DCF34E600185394 /* libfmod.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		677BC07C1DCEF95E006B21A7 /* libfmod.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 677BC07B1DCEF95E006B21A7 /* libfmod.dylib */; };
 		679164811DCF36BF00E0CBA8 /* Images.xcassets in Copy Bundle Resources */ = {isa = PBXBuildFile; fileRef = 679164801DCF36BF00E0CBA8 /* Images.xcassets */; };
+		67F5F7961DDB619F009F50AC /* libportaudio.2.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 67F5F7951DDB619F009F50AC /* libportaudio.2.dylib */; };
+		67F5F79B1DDB61CE009F50AC /* libavcodec.57.64.100.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 67F5F7971DDB61CD009F50AC /* libavcodec.57.64.100.dylib */; };
+		67F5F79C1DDB61CE009F50AC /* libavformat.57.56.100.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 67F5F7981DDB61CD009F50AC /* libavformat.57.56.100.dylib */; };
+		67F5F79D1DDB61CE009F50AC /* libavutil.55.34.100.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 67F5F7991DDB61CD009F50AC /* libavutil.55.34.100.dylib */; };
+		67F5F79E1DDB61CE009F50AC /* libswresample.2.3.100.dylib in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = 67F5F79A1DDB61CE009F50AC /* libswresample.2.3.100.dylib */; };
 		6FE9296E90F2FCE9ABAE1D41 /* QtGui.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D696AF494C6046611405F9BF /* QtGui.framework */; };
 		8771A8C96E9C391044035D99 /* OpenGL.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = D4B32C2222F82AC56BADEB21 /* OpenGL.framework */; };
 		8D267F2E4776F0ECA2F49DC8 /* IOKit.framework in Link Binary With Libraries */ = {isa = PBXBuildFile; fileRef = A1A67BEAA744704B29168D39 /* IOKit.framework */; };
@@ -60,7 +63,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				674F2F551DCF34E600185394 /* libxlsxwriter.dylib in CopyFiles */,
-				674F2F561DCF34E600185394 /* libfmod.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,8 +76,12 @@
 		4ED24D98AB081983D0B74823 /* moc_MainWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = moc_MainWindow.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/GeneratedFiles/release/moc_MainWindow.cpp; sourceTree = "<absolute>"; };
 		5B700EA82448FBAEF238E540 /* Audio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Audio.cpp; path = /Users/kukdh1/Documents/Xcode/Listening_Test/Audio.cpp; sourceTree = "<absolute>"; };
 		674F2F521DCF34D900185394 /* libxlsxwriter.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxlsxwriter.dylib; path = ../../git/libxlsxwriter/lib/libxlsxwriter.dylib; sourceTree = "<group>"; };
-		677BC07B1DCEF95E006B21A7 /* libfmod.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfmod.dylib; path = ../../fmod/osx/lib/libfmod.dylib; sourceTree = "<group>"; };
 		679164801DCF36BF00E0CBA8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Listening_Test/Images.xcassets; sourceTree = "<group>"; };
+		67F5F7951DDB619F009F50AC /* libportaudio.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libportaudio.2.dylib; path = ../../../../../usr/local/Cellar/portaudio/19.20140130/lib/libportaudio.2.dylib; sourceTree = "<group>"; };
+		67F5F7971DDB61CD009F50AC /* libavcodec.57.64.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavcodec.57.64.100.dylib; path = ../../../../../usr/local/Cellar/ffmpeg/3.2/lib/libavcodec.57.64.100.dylib; sourceTree = "<group>"; };
+		67F5F7981DDB61CD009F50AC /* libavformat.57.56.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavformat.57.56.100.dylib; path = ../../../../../usr/local/Cellar/ffmpeg/3.2/lib/libavformat.57.56.100.dylib; sourceTree = "<group>"; };
+		67F5F7991DDB61CD009F50AC /* libavutil.55.34.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavutil.55.34.100.dylib; path = ../../../../../usr/local/Cellar/ffmpeg/3.2/lib/libavutil.55.34.100.dylib; sourceTree = "<group>"; };
+		67F5F79A1DDB61CE009F50AC /* libswresample.2.3.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswresample.2.3.100.dylib; path = ../../../../../usr/local/Cellar/ffmpeg/3.2/lib/libswresample.2.3.100.dylib; sourceTree = "<group>"; };
 		6C17577E521F546B99D0E72D /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/MainWindow.h; sourceTree = "<absolute>"; };
 		7F3C09085CF46E18723703E4 /* ui_Progress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ui_Progress.h; path = /Users/kukdh1/Documents/Xcode/Listening_Test/GeneratedFiles/ui_Progress.h; sourceTree = "<absolute>"; };
 		82AB31B40D1C74974E6A7CB8 /* .qmake.stash */ = {isa = PBXFileReference; lastKnownFileType = text; name = .qmake.stash; path = /Users/kukdh1/Documents/Xcode/Listening_Test/.qmake.stash; sourceTree = "<absolute>"; };
@@ -102,11 +108,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67F5F79B1DDB61CE009F50AC /* libavcodec.57.64.100.dylib in Link Binary With Libraries */,
+				67F5F79C1DDB61CE009F50AC /* libavformat.57.56.100.dylib in Link Binary With Libraries */,
+				67F5F79D1DDB61CE009F50AC /* libavutil.55.34.100.dylib in Link Binary With Libraries */,
+				67F5F79E1DDB61CE009F50AC /* libswresample.2.3.100.dylib in Link Binary With Libraries */,
+				67F5F7961DDB619F009F50AC /* libportaudio.2.dylib in Link Binary With Libraries */,
 				20C424F3E6013174FBB26D6D /* QtWidgets.framework in Link Binary With Libraries */,
 				6FE9296E90F2FCE9ABAE1D41 /* QtGui.framework in Link Binary With Libraries */,
 				44B9CC1EEB67DE9D19A79EAC /* QtCore.framework in Link Binary With Libraries */,
 				A99B2AA0F9CBBDD12BA126A4 /* DiskArbitration.framework in Link Binary With Libraries */,
-				677BC07C1DCEF95E006B21A7 /* libfmod.dylib in Link Binary With Libraries */,
 				8D267F2E4776F0ECA2F49DC8 /* IOKit.framework in Link Binary With Libraries */,
 				674F2F531DCF34D900185394 /* libxlsxwriter.dylib in Link Binary With Libraries */,
 				8771A8C96E9C391044035D99 /* OpenGL.framework in Link Binary With Libraries */,
@@ -179,6 +189,11 @@
 		AF39DD055C3EF8226FBE929D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				67F5F7971DDB61CD009F50AC /* libavcodec.57.64.100.dylib */,
+				67F5F7981DDB61CD009F50AC /* libavformat.57.56.100.dylib */,
+				67F5F7991DDB61CD009F50AC /* libavutil.55.34.100.dylib */,
+				67F5F79A1DDB61CE009F50AC /* libswresample.2.3.100.dylib */,
+				67F5F7951DDB619F009F50AC /* libportaudio.2.dylib */,
 				F347530E472E1A3B27BA209A /* QtWidgets.framework */,
 				D696AF494C6046611405F9BF /* QtGui.framework */,
 				987F121AA98C1F6A1E2C2993 /* QtCore.framework */,
@@ -205,7 +220,6 @@
 			isa = PBXGroup;
 			children = (
 				674F2F521DCF34D900185394 /* libxlsxwriter.dylib */,
-				677BC07B1DCEF95E006B21A7 /* libfmod.dylib */,
 				2EB56BE3C2D93CDAB0C52E67 /* Sources */,
 				25B08E2869634E9BCBA333A2 /* Generated Sources */,
 				74B182DB50CB5611B5C1C297 /* Supporting Files */,
@@ -237,7 +251,7 @@
 				9C316F444A62BF296E3E1F25 /* Project Copy */,
 				30414803F31797EB689AE508 /* Copy Bundle Resources */,
 				674F2F541DCF34DD00185394 /* CopyFiles */,
-				674F2F571DCF34EA00185394 /* ShellScript */,
+				674F2F571DCF34EA00185394 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -257,6 +271,9 @@
 			isa = PBXProject;
 			attributes = {
 				TargetAttributes = {
+					6E1920B6E00270357A25000F = {
+						DevelopmentTeam = 62G5243WAS;
+					};
 					C5D2E313E8D082604BADA5DA = {
 						DevelopmentTeam = 62G5243WAS;
 						ProvisioningStyle = Automatic;
@@ -305,18 +322,19 @@
 			shellScript = "make -C /Users/kukdh1/Documents/Xcode/Listening_Test/ -f Listening_Test.xcodeproj/qt_makeqmake.mak";
 			showEnvVarsInLog = 0;
 		};
-		674F2F571DCF34EA00185394 /* ShellScript */ = {
+		674F2F571DCF34EA00185394 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "install_name_tool -id @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks/libxlsxwriter.dylib\"\ninstall_name_tool -id @executable_path/../Frameworks/libfmod.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks/libfmod.dylib\"\ninstall_name_tool -change /usr/lib/libxlsxwriter.dylib @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/Listening_Test\"\ninstall_name_tool -change @rpath/libfmod.dylib @executable_path/../Frameworks/libfmod.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/Listening_Test\"";
+			shellScript = "install_name_tool -id @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks/libxlsxwriter.dylib\"\ninstall_name_tool -change /usr/lib/libxlsxwriter.dylib @executable_path/../Frameworks/libxlsxwriter.dylib \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/Listening_Test\"";
 		};
 		7EF0942E79C014DCEC8976BC /* Qt Preprocessors */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -553,7 +571,8 @@
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/AGL.framework/Headers,
 					GeneratedFiles,
 					"../../../Qt/5.7/clang_64/mkspecs/macx-clang",
-					"~/Documents/fmod/osx/inc",
+					/usr/local/Cellar/portaudio/19.20140130/include,
+					/usr/local/Cellar/ffmpeg/3.2/include,
 					"~/Documents/git/libxlsxwriter/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -561,6 +580,8 @@
 					/System/Library/Frameworks/,
 					"~/Documents/git/libxlsxwriter/lib",
 					"~/Documents/fmod/osx/lib",
+					/usr/local/Cellar/portaudio/19.20140130/lib,
+					/usr/local/Cellar/ffmpeg/3.2/lib,
 				);
 				PRODUCT_NAME = Listening_Test;
 				QT_LIBRARY_SUFFIX = "";
@@ -591,7 +612,8 @@
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/AGL.framework/Headers,
 					GeneratedFiles,
 					"../../../Qt/5.7/clang_64/mkspecs/macx-clang",
-					"~/Documents/fmod/osx/inc",
+					/usr/local/Cellar/portaudio/19.20140130/include,
+					/usr/local/Cellar/ffmpeg/3.2/include,
 					"~/Documents/git/libxlsxwriter/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -599,6 +621,8 @@
 					/System/Library/Frameworks/,
 					"~/Documents/git/libxlsxwriter/lib",
 					"~/Documents/fmod/osx/lib",
+					/usr/local/Cellar/portaudio/19.20140130/lib,
+					/usr/local/Cellar/ffmpeg/3.2/lib,
 				);
 				PRODUCT_NAME = Listening_Test;
 				QT_LIBRARY_SUFFIX = _debug;
