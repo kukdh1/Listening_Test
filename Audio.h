@@ -8,7 +8,7 @@
 #include <functional>
 #include <exception>
 #include <time.h>
-#include <SDL.h>
+#include <portaudio.h>
 
 extern "C" {
   #include <libavcodec/avcodec.h>
@@ -21,12 +21,7 @@ extern "C" {
 #pragma comment(lib, "avutil.lib")
 #pragma comment(lib, "avformat.lib")
 #pragma comment(lib, "avcodec.lib")
-#pragma comment(lib, "SDL2.lib")
-#pragma comment(lib, "SDL2main.lib")
-#endif
-
-#ifdef QT_NEEDS_QMAIN
-#undef QT_NEEDS_QMAIN
+#pragma comment(lib, "portaudio_x86.lib")
 #endif
 
 class AudioSystem {
@@ -47,12 +42,14 @@ class SongSession {
     uint32_t channel_count;
 
     uint32_t audio_index;
-    SDL_AudioSpec spec;
+    PaStreamParameters spec;
+    PaStream *current_stream;
+    uint32_t current_freq;
     uint32_t byte_per_sample;
     std::string *current_data;
 
-    std::string data_192_32;  // Buffer for 192/96 kHz 24Bit audio
-    std::string data_48_32;
+    std::string data_192_24;  // Buffer for 192/96 kHz 24Bit audio
+    std::string data_48_24;
     std::string data_48_8;
 
     bool bSampleRateTest;
@@ -61,7 +58,7 @@ class SongSession {
     bool bFirstSoundIsBetter;
     bool bTestingSamplerate;
 
-    static void fill_audio(void *, uint8_t *, int);
+    static int fill_audio(const void *, void *, unsigned long, const PaStreamCallbackTimeInfo *, PaStreamCallbackFlags, void *);
     uint32_t msToSample(uint32_t);
     uint32_t sampleToMs(uint32_t);
 

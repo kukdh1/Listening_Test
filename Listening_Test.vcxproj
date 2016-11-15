@@ -40,13 +40,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\local\SDL-2.0.5\include;D:\local\ffmpeg-3.2\include;D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\local\SDL-2.0.5\lib\x86;D:\local\ffmpeg-3.2\lib;D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\local\portaudio-20161030\include;D:\local\ffmpeg-3.2\include;D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\local\portaudio-20161030\bin\Debug;D:\local\ffmpeg-3.2\lib;D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\local\SDL-2.0.5\include;D:\local\ffmpeg-3.2\include;D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\local\SDL-2.0.5\lib\x86;D:\local\ffmpeg-3.2\lib;D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\local\portaudio-20161030\include;D:\local\ffmpeg-3.2\include;D:\local\libxlsxwriter-0.4.2\include;D:\local\fmod-1.08.14\win\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\local\portaudio-20161030\bin\Release;D:\local\ffmpeg-3.2\lib;D:\local\libxlsxwriter-0.4.2\lib_MD;D:\local\fmod-1.08.14\win\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -62,7 +62,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -79,7 +79,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
