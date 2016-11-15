@@ -188,6 +188,7 @@ MainWindow::MainWindow(QWidget *parent)
 
       ui.playButton_1->setEnabled(true);
       ui.stopButton_2->setEnabled(false);
+      ui.timeSlider->setEnabled(false);
     }
   });
   connect(ui.selectSongButton_2, &QPushButton::clicked, [&]() {
