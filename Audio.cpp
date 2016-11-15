@@ -1,80 +1,49 @@
 #include "Audio.h"
 
 AudioSystem::AudioSystem() {
-  FMOD_RESULT result;
-
-  result = FMOD::System_Create(&system);
-
-  if (result != FMOD_OK) {
-    throw std::exception();
-  }
-
-  system->init(4, FMOD_INIT_NORMAL, NULL);
+  SDL_Init(SDL_INIT_AUDIO);
+  av_register_all();
 
   srand(time(NULL));
 }
 
 AudioSystem::~AudioSystem() {
-  system->close();
-  system->release();
+  SDL_Quit();
 }
 
-FMOD_RESULT AudioSystem::createSound(std::string &path, FMOD::Sound **out) {
-  return system->createSound(path.c_str(), FMOD_DEFAULT | FMOD_OPENONLY, NULL, out);
-}
+bool AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bitdepth) {
+  AVFormatContext *avf_context;
+  bool result;
 
-FMOD_RESULT AudioSystem::createSound(std::string &buffer, uint32_t freq, uint8_t depth, uint8_t channel, FMOD::Sound **out) {
-  FMOD_CREATESOUNDEXINFO info;
+  avf_context = avformat_alloc_context();
+  result = avformat_open_input(&avf_context, path.c_str(), NULL, NULL) >= 0;
 
-  memset(&info, 0, sizeof(FMOD_CREATESOUNDEXINFO));
-  info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-  info.length = buffer.size();
-  info.defaultfrequency = (int)freq;
-  info.numchannels = (int)channel;
-
-  switch (depth) {
-    case 8:       info.format = FMOD_SOUND_FORMAT_PCM8;   break;
-    case 16:      info.format = FMOD_SOUND_FORMAT_PCM16;  break;
-    case 24:      info.format = FMOD_SOUND_FORMAT_PCM24;  break;
-    case 32:      info.format = FMOD_SOUND_FORMAT_PCM32;  break;
-  }
-
-  return system->createSound(buffer.c_str(), FMOD_OPENMEMORY | FMOD_OPENRAW | FMOD_CREATESTREAM, &info, out);
-}
-
-FMOD_RESULT AudioSystem::playSound(FMOD::Sound *sound, FMOD::Channel **out) {
-  FMOD_RESULT result;
-
-  result = system->playSound(sound, NULL, true, out);
-
-  if (result == FMOD_OK) {
-    (*out)->setVolume(0.5f);
-  }
-
-  return result;
-}
-
-FMOD_RESULT AudioSystem::update() {
-  return system->update();
-}
-
-FMOD_RESULT AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bitdepth) {
-  FMOD_RESULT result;
-  FMOD::Sound *sound;
-
-  result = createSound(path, &sound);
-
-  if (result == FMOD_OK) {
+  if (result) {
     float freq;
     int bits;
 
-    sound->getDefaults(&freq, NULL);
-    sound->getFormat(NULL, NULL, NULL, &bits);
+    result = avformat_find_stream_info(avf_context, NULL) >= 0;
 
-    samplingrate = (uint32_t)freq;
-    bitdepth = (uint8_t)bits;
+    if (result) {
+      unsigned int audio_id = UINT_MAX;
 
-    sound->release();
+      for (unsigned int i = 0; i < avf_context->nb_streams; i++) {
+        if (avf_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+          audio_id = i;
+          break;
+        }
+      }
+
+      if (audio_id != UINT_MAX) {
+        samplingrate = (uint32_t)avf_context->streams[audio_id]->codec->sample_rate;
+        bitdepth = (uint8_t)avf_context->streams[audio_id]->codec->bits_per_raw_sample;
+      }
+      else {
+        result = false;
+      }
+    }
+
+    avformat_close_input(&avf_context);
   }
 
   return result;
@@ -82,75 +51,125 @@ FMOD_RESULT AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint
 
 SongSession::SongSession(AudioSystem *_pSystem) {
   pSystem = _pSystem;
-  sound = NULL;
-  channel = NULL;
 
   bBitDepthTest = false;
   bSampleRateTest = false;
+
+  avf_context = NULL;
+  stream_id = UINT_MAX;
 }
 
 SongSession::~SongSession() {
-  SAFE_RELEASE(sound);
+  if (avf_context) {
+    avformat_close_input(&avf_context);
+  }
 }
 
 bool SongSession::openSound(const char *filepath) {
-  FMOD_RESULT result;
+  bool result;
 
-  path = std::string(filepath);
-  result = pSystem->createSound(path, &sound);
+  avf_context = avformat_alloc_context();
+  result = avformat_open_input(&avf_context, filepath, NULL, NULL) >= 0;
 
-  if (result == FMOD_OK) {
+  if (result) {
     float freq;
-    int cn, bits;
+    int bits;
 
-    sound->getDefaults(&freq, NULL);
-    sound->getFormat(NULL, NULL, &cn, &bits);
+    result = avformat_find_stream_info(avf_context, NULL) >= 0;
 
-    samplingrate = (uint32_t)freq;
-    channel_count = (uint8_t)cn;
+    if (result) {
+      int bits;
 
-    if (bits == 24) {
-      bBitDepthTest = true;
+      for (unsigned int i = 0; i < avf_context->nb_streams; i++) {
+        if (avf_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+          stream_id = i;
+          break;
+        }
+      }
 
-      if (samplingrate == 96000 || samplingrate == 192000)
-        bSampleRateTest = true;
+      if (stream_id != UINT_MAX) {
+        samplingrate = (uint32_t)avf_context->streams[stream_id]->codec->sample_rate;
+        bits = avf_context->streams[stream_id]->codec->bits_per_raw_sample;
+        channel_count = (uint32_t)avf_context->streams[stream_id]->codec->channels;
+
+        if (bits == 24) {
+          bBitDepthTest = true;
+
+          if (samplingrate == 96000 || samplingrate == 192000)
+            bSampleRateTest = true;
+        }
+      }
+      else {
+        result = false;
+      }
     }
-
-    SAFE_RELEASE(sound);
-
-    return true;
   }
-  
-  return false;
+
+  return result;
 }
 
 bool SongSession::readSound() {
-  FMOD_RESULT result;
+  bool result = false;
 
-  result = pSystem->createSound(path, &sound);
-
-  if (result == FMOD_OK) {
+  if (avf_context) {
     if (bBitDepthTest || bSampleRateTest) {
-      uint32_t bytelength, byteread;
+      AVPacket packet;
+      AVFrame *frame;
+      AVCodecContext *ctx;
+      AVCodec *codec;
+      std::string buffer;
       std::string *data;
 
-      sound->getLength(&bytelength, FMOD_TIMEUNIT_PCMBYTES);
+      buffer.resize(MAX_AUDIO_FRAME_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
 
       if (bSampleRateTest)
-        data = &data_192_24;
+        data = &data_192_32;
       else
-        data = &data_48_24;
+        data = &data_48_32;
 
-      data->resize(bytelength);
-      sound->readData((char *)data->c_str(), bytelength, &byteread);
+      ctx = avf_context->streams[stream_id]->codec;
+      codec = avcodec_find_decoder(ctx->codec_id);
+
+      if (codec == NULL) {
+        goto READ_SOUND_CLEANUP;
+      }
+
+      if (avcodec_open2(ctx, codec, NULL) < 0) {
+        goto READ_SOUND_CLEANUP;
+      }
+
+      av_init_packet(&packet);
+      frame = av_frame_alloc();
+
+      packet.data = (uint8_t *)buffer.c_str();
+      packet.size = buffer.size();
+
+      int len;
+      int frame_ptr = 0;
+      while (av_read_frame(avf_context, &packet) >= 0) {
+        if (packet.stream_index == stream_id) {
+          len = avcodec_decode_audio4(ctx, frame, &frame_ptr, &packet);
+
+          if (frame_ptr) {
+            // libavcodec provide 32bit sample for 24bit audio
+            data->append((char *)frame->extended_data[0], frame->linesize[0]);
+          }
+        }
+      }
+
+      av_frame_free(&frame);
+    }
+    else {
+      goto READ_SOUND_CLEANUP;
     }
 
-    SAFE_RELEASE(sound);
-
-    return true;
+    result = true;
   }
 
-  return false;
+READ_SOUND_CLEANUP:
+  avformat_close_input(&avf_context);
+
+  return result;
 }
 
 bool SongSession::enableSamplingrateTest() {
@@ -173,16 +192,16 @@ void SongSession::convertSamplingrate() {
   bFirstSoundIsBetter = rand() % 2;
   bTestingSamplerate = true;
 
-  if (bSampleRateTest && data_48_24.size() == 0) {
+  if (bSampleRateTest && data_48_32.size() == 0) {
     uint32_t step = samplingrate / 48000;
-    uint32_t count = data_192_24.size();
-    uint32_t samplesize = 3 * channel_count;
+    uint32_t count = data_192_32.size();
+    uint32_t samplesize = 4 * channel_count;
 
-    data_48_24.resize(count / step);
-    count = data_48_24.size() / samplesize; // samples
+    data_48_32.resize(count / step);
+    count = data_48_32.size() / samplesize; // samples
 
     for (uint32_t i = 0; i < count; i ++) {
-      memcpy((char *)data_48_24.c_str() + i * samplesize, data_192_24.c_str() + i * step * samplesize, samplesize);
+      memcpy((char *)data_48_32.c_str() + i * samplesize, data_192_32.c_str() + i * step * samplesize, samplesize);
     }
   }
 }
@@ -191,91 +210,101 @@ void SongSession::convertBitdepth() {
   bTestingSamplerate = false;
 
   if (bBitDepthTest && data_48_8.size() == 0) {
-    uint32_t count = data_48_24.size();
+    uint32_t count = data_48_32.size();
 
-    data_48_8.resize(data_48_24.size() / 3);
+    data_48_8.resize(data_48_32.size() / 4);
     count = data_48_8.size(); // samples
 
     for (uint32_t i = 0; i < count; i++) {
-      data_48_8.at(i) = data_48_24.at(i * 3 + 2) + 0x80;
+      data_48_8.at(i) = data_48_32.at(i * 4 + 3) + 0x80;
     }
   }
 }
 
-void SongSession::startPlaying(bool bFirst) {
-  FMOD_RESULT result;
+bool SongSession::startPlaying(bool bFirst) {
+  bool result;
 
   if (isInited())
-    return;
+    return false;
+  
+  // fill default specs
+  spec.channels = channel_count;
+  spec.userdata = this;
+  spec.callback = fill_audio;
+  spec.samples = 4096;
 
   if (bFirstSoundIsBetter ^ bFirst) { // play low quality
     if (bTestingSamplerate) {
-      result = pSystem->createSound(data_48_24, 48000, 24, channel_count, &sound);
+      current_data = &data_48_32;
+      byte_per_sample = 4;
+      spec.freq = 48000;
+      spec.format = AUDIO_S32;
     }
     else {
-      result = pSystem->createSound(data_48_8, 48000, 8, channel_count, &sound);
+      current_data = &data_48_8;
+      byte_per_sample = 1;
+      spec.freq = 48000;
+      spec.format = AUDIO_U8;
     }
   }
   else {
     if (bTestingSamplerate) {
-      result = pSystem->createSound(data_192_24, samplingrate, 24, channel_count, &sound);
+      current_data = &data_192_32;
+      byte_per_sample = 4;
+      spec.freq = samplingrate;
+      spec.format = AUDIO_S32;
     }
     else {
-      result = pSystem->createSound(data_48_24, 48000, 24, channel_count, &sound);
+      current_data = &data_48_32;
+      byte_per_sample = 4;
+      spec.freq = 48000;
+      spec.format = AUDIO_S32;
     }
   }
 
-  if (result == FMOD_OK) {
-    result = pSystem->playSound(sound, &channel);
+  // Open audio
+  audio_index = 0;
+  result = SDL_OpenAudio(&spec, NULL) >= 0;
 
-    if (result != FMOD_OK) {
-      SAFE_RELEASE(sound);
-    }
-  }
+  return result;
 }
 
 bool SongSession::isInited() {
-  return sound || channel;
+  return spec.userdata == this;
 }
 
 bool SongSession::isPlaying() {
-  bool bPaused = true;
-  
-  if (channel) {
-    channel->getPaused(&bPaused);
-  }
-
-  return !bPaused;
+  return SDL_GetAudioStatus() == SDL_AUDIO_PLAYING;
 }
 
 void SongSession::togglePlaying() {
-  channel->setPaused(isPlaying());
+  SDL_PauseAudio(isPlaying());
 }
 
 void SongSession::stopPlaying() {
-  channel->stop();
-  channel = NULL;
-
-  SAFE_RELEASE(sound);
+  SDL_CloseAudio();
+  memset(&spec, 0, sizeof(SDL_AudioSpec));
 }
 
 void SongSession::getTimeInfo(uint32_t &current, uint32_t &max) {
   if (isPlaying()) {
-    uint32_t pos;
-    uint32_t len;
-
-    channel->getPosition(&pos, FMOD_TIMEUNIT_MS);
-    sound->getLength(&len, FMOD_TIMEUNIT_MS);
-
-    current = pos;
-    max = len;
+    current = sampleToMs(audio_index / byte_per_sample);
+    max = sampleToMs(current_data->size() / byte_per_sample);
   }
 }
 
 void SongSession::setTime(uint32_t current) {
-  if (channel) {
-    channel->setPosition(current, FMOD_TIMEUNIT_MS);
-  }
+  audio_index = msToSample(current) * byte_per_sample;
+}
+
+uint32_t SongSession::msToSample(uint32_t ms) {
+  float samples_per_second = spec.freq * spec.channels;
+  return (uint32_t)(samples_per_second / 1000.f * ms + 0.5f);
+}
+
+uint32_t SongSession::sampleToMs(uint32_t sample) {
+  float samples_per_second = spec.freq * spec.channels;
+  return (uint32_t)(sample / samples_per_second * 1000.f + 0.5f);
 }
 
 bool SongSession::isCorrectAnswer(bool bSelected) {
@@ -284,4 +313,17 @@ bool SongSession::isCorrectAnswer(bool bSelected) {
 
 bool SongSession::isSamplingrateTest() {
   return bTestingSamplerate;
+}
+
+void SongSession::fill_audio(void *udata, uint8_t *stream, int len) {
+  SongSession *pThis = (SongSession *)udata;
+
+  int bytes_left = pThis->current_data->size() - pThis->audio_index;
+
+  if (bytes_left <= 0)
+    return;
+
+  len = SDL_min(len, bytes_left);
+  SDL_MixAudio(stream, (uint8_t *)pThis->current_data->c_str() + pThis->audio_index, len, SDL_MIX_MAXVOLUME);
+  pThis->audio_index += len;
 }

@@ -6,51 +6,64 @@
 #include <iostream>
 #include <string>
 #include <functional>
-#include <fmod.hpp>
 #include <exception>
 #include <time.h>
+#include <SDL.h>
 
-#ifdef WIN32
-#pragma comment(lib, "fmod_vc.lib")
+extern "C" {
+  #include <libavcodec/avcodec.h>
+  #include <libavformat/avformat.h>
+}
+
+#define MAX_AUDIO_FRAME_SIZE    192000
+
+#ifdef _WIN32
+#pragma comment(lib, "avutil.lib")
+#pragma comment(lib, "avformat.lib")
+#pragma comment(lib, "avcodec.lib")
+#pragma comment(lib, "SDL2.lib")
+#pragma comment(lib, "SDL2main.lib")
 #endif
 
-#define SAFE_RELEASE(object)    { if (object) { object->release(); object = NULL; } }
+#ifdef QT_NEEDS_QMAIN
+#undef QT_NEEDS_QMAIN
+#endif
 
 class AudioSystem {
-  private:
-    FMOD::System *system;
-
   public:
     AudioSystem();
     ~AudioSystem();
 
-    FMOD_RESULT createSound(std::string &, FMOD::Sound **);
-    FMOD_RESULT createSound(std::string &, uint32_t, uint8_t, uint8_t, FMOD::Sound **);
-    FMOD_RESULT playSound(FMOD::Sound *, FMOD::Channel **);
-    FMOD_RESULT update();
-    FMOD_RESULT getInfo(std::string &, uint32_t &, uint8_t &);
+    bool getInfo(std::string &, uint32_t &, uint8_t &);
 };
 
 class SongSession {
   private:
     AudioSystem *pSystem;
 
-    std::string path;
+    AVFormatContext *avf_context;
+    uint32_t stream_id;
     uint32_t samplingrate;
-    uint8_t channel_count;
+    uint32_t channel_count;
 
-    std::string data_192_24;  // Buffer for 192/96 kHz 24Bit audio
-    std::string data_48_24;
+    uint32_t audio_index;
+    SDL_AudioSpec spec;
+    uint32_t byte_per_sample;
+    std::string *current_data;
+
+    std::string data_192_32;  // Buffer for 192/96 kHz 24Bit audio
+    std::string data_48_32;
     std::string data_48_8;
-
-    FMOD::Sound *sound;
-    FMOD::Channel *channel;
 
     bool bSampleRateTest;
     bool bBitDepthTest;
 
     bool bFirstSoundIsBetter;
     bool bTestingSamplerate;
+
+    static void fill_audio(void *, uint8_t *, int);
+    uint32_t msToSample(uint32_t);
+    uint32_t sampleToMs(uint32_t);
 
   public:
     SongSession(AudioSystem *);
@@ -67,7 +80,7 @@ class SongSession {
     void convertSamplingrate();
     void convertBitdepth();
 
-    void startPlaying(bool);
+    bool startPlaying(bool);
     bool isInited();
     bool isPlaying();
     void togglePlaying();
@@ -76,7 +89,7 @@ class SongSession {
     void getTimeInfo(uint32_t &, uint32_t &);
     void setTime(uint32_t);
     
-    bool isCorrectAnswer(bool bSelected);
+    bool isCorrectAnswer(bool);
     bool isSamplingrateTest();
 };
 
