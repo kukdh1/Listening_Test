@@ -255,6 +255,15 @@ MainWindow::MainWindow(QWidget *parent)
       session->setTime(value);
     }
   });
+  connect(ui.sineWaveButton, &QPushButton::clicked, [&]() {
+    if (!session) {
+      session = new SongSession(&audio);
+
+      session->sineWaveTest();
+
+      SAFE_DELETE(session);
+    }
+  });
 
   // Begin timer
   timer.start(1000);

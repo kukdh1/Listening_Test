@@ -66,6 +66,8 @@ class SongSession {
     SongSession(AudioSystem *);
     ~SongSession();
 
+    void sineWaveTest();
+
     bool openSound(const char *);
     bool readSound();
     bool enableSamplingrateTest();

@@ -59,11 +59,40 @@ SongSession::SongSession(AudioSystem *_pSystem) {
   current_stream = NULL;
   stream_id = UINT_MAX;
   current_freq = 0;
+  audio_index = 0;
 }
 
 SongSession::~SongSession() {
   if (avf_context) {
     avformat_close_input(&avf_context);
+  }
+}
+
+void SongSession::sineWaveTest() {
+  // Create sine wave (1sec)
+  current_freq = 192000;
+  memset(&spec, 0, sizeof(PaStreamParameters));
+  spec.device = Pa_GetDefaultOutputDevice();
+  spec.channelCount = 1;
+  spec.suggestedLatency = Pa_GetDeviceInfo(spec.device)->defaultLowOutputLatency;
+  spec.sampleFormat = paUInt8;
+  current_data = &data_192_24;
+  byte_per_sample = 1;
+  uint32_t buffersize = current_freq * spec.channelCount / 10;
+
+  // Create buffer
+  data_192_24.resize(current_freq);
+
+  for (uint32_t i = 0; i < current_freq; i++) {
+    data_192_24.at(i) = i % 2 ? 0x40 : 0xC0;
+  }
+
+  // Play sinewave for 1 sec
+  if (Pa_OpenStream(&current_stream, NULL, &spec, current_freq, buffersize, paClipOff, fill_audio, this) == paNoError) {
+    Pa_StartStream(current_stream);
+    Pa_Sleep(1000);
+    Pa_StopStream(current_stream);
+    Pa_CloseStream(current_stream);
   }
 }
 
