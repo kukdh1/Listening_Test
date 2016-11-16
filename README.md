@@ -12,4 +12,5 @@ Does human can determine which one is better quality sound?
 ## Dependency
 - Qt 5.7
 - libxlsxwriter 0.4.2
-- fmod 1.08.14
+- ffmpeg 3.2
+- portaudio v19.20161030
