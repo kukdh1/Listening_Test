@@ -28,15 +28,15 @@ bool AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bi
       unsigned int audio_id = UINT_MAX;
 
       for (unsigned int i = 0; i < avf_context->nb_streams; i++) {
-        if (avf_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (avf_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
           audio_id = i;
           break;
         }
       }
 
       if (audio_id != UINT_MAX) {
-        samplingrate = (uint32_t)avf_context->streams[audio_id]->codec->sample_rate;
-        bitdepth = (uint8_t)avf_context->streams[audio_id]->codec->bits_per_raw_sample;
+        samplingrate = (uint32_t)avf_context->streams[audio_id]->codecpar->sample_rate;
+        bitdepth = (uint8_t)avf_context->streams[audio_id]->codecpar->bits_per_raw_sample;
       }
       else {
         result = false;
@@ -119,16 +119,16 @@ bool SongSession::openSound(const char *filepath) {
       int bits;
 
       for (unsigned int i = 0; i < avf_context->nb_streams; i++) {
-        if (avf_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (avf_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
           stream_id = i;
           break;
         }
       }
 
       if (stream_id != UINT_MAX) {
-        samplingrate = (uint32_t)avf_context->streams[stream_id]->codec->sample_rate;
-        bits = avf_context->streams[stream_id]->codec->bits_per_raw_sample;
-        channel_count = (uint32_t)avf_context->streams[stream_id]->codec->channels;
+        samplingrate = (uint32_t)avf_context->streams[stream_id]->codecpar->sample_rate;
+        bits = avf_context->streams[stream_id]->codecpar->bits_per_raw_sample;
+        channel_count = (uint32_t)avf_context->streams[stream_id]->codecpar->channels;
 
         if (bits == 24) {
           bBitDepthTest = true;
@@ -154,6 +154,7 @@ bool SongSession::readSound() {
       AVPacket packet;
       AVFrame *frame;
       AVCodecContext *ctx;
+      AVCodecParameters *cpar;
       AVCodec *codec;
       std::string buffer;
       std::string *data;
@@ -165,7 +166,18 @@ bool SongSession::readSound() {
       else
         data = &data_48_24;
 
-      ctx = avf_context->streams[stream_id]->codec;
+      cpar = avf_context->streams[stream_id]->codecpar;
+      ctx = avcodec_alloc_context3(NULL);
+      
+      if (ctx == NULL) {
+        goto READ_SOUND_CLEANUP;
+      }
+      
+      if (avcodec_parameters_to_context(ctx, cpar) < 0) {
+        avcodec_free_context(&ctx);
+        goto READ_SOUND_CLEANUP;
+      }
+      
       codec = avcodec_find_decoder(ctx->codec_id);
 
       if (codec == NULL) {
@@ -220,11 +232,12 @@ bool SongSession::readSound() {
           av_frame_unref(frame);
         }
 
-        av_free_packet(&packet);  // av_init_packet
+        av_packet_unref(&packet);  // av_init_packet
       }
 
-      av_frame_free(&frame);    // av_frame_alloc
-      avcodec_close(ctx);       // avcodec_open2
+      av_frame_free(&frame);        // av_frame_alloc
+      avcodec_close(ctx);           // avcodec_open2
+      avcodec_free_context(&ctx);   // avcodec_alloc_context3
     }
     else {
       goto READ_SOUND_CLEANUP;
