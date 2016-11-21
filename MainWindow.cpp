@@ -20,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
 
   // Connect handler
   connect(&timer, &QTimer::timeout, [&]() {
-    audio.update();
-
     if (session) {
       if (session->isPlaying()) {
         uint32_t cur, max;
@@ -59,17 +57,19 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
   connect(ui.addFilebutton, &QPushButton::clicked, [&]() {
-    QString path = QFileDialog::getOpenFileName();
+    QStringList pathlist = QFileDialog::getOpenFileNames();
     
-    if (path.length() > 0) {
-      uint32_t samplerate;
-      uint8_t bitdepth;
-      std::string stdpath = path.toStdString();
-
-      if (audio.getInfo(stdpath, samplerate, bitdepth) == FMOD_OK) {
-        Song song(path, samplerate, bitdepth);
-
-        songModel.appendSong(song);
+    if (pathlist.length() > 0) {
+      for (auto path : pathlist) {
+        uint32_t samplerate;
+        uint8_t bitdepth;
+        std::string stdpath = path.toStdString();
+        
+        if (audio.getInfo(stdpath, samplerate, bitdepth)) {
+          Song song(path, samplerate, bitdepth);
+          
+          songModel.appendSong(song);
+        }
       }
     }
   });
@@ -126,13 +126,13 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui.playButton_1, &QPushButton::clicked, [&]() {
     if (session) {
       if (!session->isInited()) {
-        ui.currentFileLabel->setText(STRING_UI_PLAYING_FIRST);
+        if (session->startPlaying(true)) {
+          ui.currentFileLabel->setText(STRING_UI_PLAYING_FIRST);
 
-        session->startPlaying(true);
-
-        ui.playButton_2->setEnabled(false);
-        ui.stopButton_1->setEnabled(true);
-        ui.timeSlider->setEnabled(true);
+          ui.playButton_2->setEnabled(false);
+          ui.stopButton_1->setEnabled(true);
+          ui.timeSlider->setEnabled(true);
+        }
       }
 
       session->togglePlaying();
@@ -168,13 +168,13 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui.playButton_2, &QPushButton::clicked, [&]() {
     if (session) {
       if (!session->isInited()) {
-        ui.currentFileLabel->setText(STRING_UI_PLAYING_SECOND);
+        if (session->startPlaying(false)) {
+          ui.currentFileLabel->setText(STRING_UI_PLAYING_SECOND);
 
-        session->startPlaying(false);
-
-        ui.playButton_1->setEnabled(false);
-        ui.stopButton_2->setEnabled(true);
-        ui.timeSlider->setEnabled(true);
+          ui.playButton_1->setEnabled(false);
+          ui.stopButton_2->setEnabled(true);
+          ui.timeSlider->setEnabled(true);
+        }
       }
 
       session->togglePlaying();
@@ -188,6 +188,7 @@ MainWindow::MainWindow(QWidget *parent)
 
       ui.playButton_1->setEnabled(true);
       ui.stopButton_2->setEnabled(false);
+      ui.timeSlider->setEnabled(false);
     }
   });
   connect(ui.selectSongButton_2, &QPushButton::clicked, [&]() {
@@ -207,7 +208,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
   connect(ui.saveResultButton, &QPushButton::clicked, [&]() {
-    QString path = QFileDialog::getSaveFileName();
+    QString filter = "Microsoft Excel (*.xlsx)";
+    QString path = QFileDialog::getSaveFileName(NULL, QString(), "result.xlsx", filter, &filter);
 
     if (path.length() > 0) {
       resultModel.saveList(path);
@@ -251,6 +253,15 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui.timeSlider, &QSlider::valueChanged, [&](int value) {
     if (session) {
       session->setTime(value);
+    }
+  });
+  connect(ui.sineWaveButton, &QPushButton::clicked, [&]() {
+    if (!session) {
+      session = new SongSession(&audio);
+
+      session->sineWaveTest();
+
+      SAFE_DELETE(session);
     }
   });
 

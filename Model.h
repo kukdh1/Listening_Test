@@ -14,6 +14,7 @@
 #else
 #pragma comment(lib, "libxlsxwriter.lib")
 #endif
+#pragma comment(lib, "Zlib.lib")
 #endif
 
 #define STRING_TEST_SAMPLINGRATE      "Sampling Rate"
