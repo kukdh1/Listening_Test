@@ -81,19 +81,6 @@
      <string>Current File</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="testSamplingRateButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>250</y>
-      <width>381</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Sampling Rate Test</string>
-    </property>
-   </widget>
    <widget class="QSlider" name="timeSlider">
     <property name="geometry">
      <rect>
@@ -269,19 +256,6 @@
      <string>Save Result</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="testBitDepthButton">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>250</y>
-      <width>381</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Bit Depth Test</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="resetResultButton">
     <property name="geometry">
      <rect>
@@ -306,6 +280,49 @@
     </property>
     <property name="text">
      <string>sine</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="testTypeCombo">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>250</y>
+      <width>221</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="hqAudioCombo">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>250</y>
+      <width>211</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="lqAudioCombo">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>250</y>
+      <width>211</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="testConfirmButton">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>250</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Begin Test</string>
     </property>
    </widget>
   </widget>
