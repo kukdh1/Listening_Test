@@ -56,10 +56,18 @@ QString Song::getPath() {
 
 Result::Result() {}
 
-Result::Result(QString &_filename, TEST_TYPE _type, bool _bCorrect) {
+Result::Result(QString &_filename, TEST_TYPE _type, bool _bFirstSoundIsBetter, bool _bUserSelectFirstSound, uint32_t uiHQ, uint32_t uiLQ, QString &_memo) {
   setData(0, _filename);
   type = _type;
-  bCorrect = _bCorrect;
+  bFirstSoundIsBetter = _bFirstSoundIsBetter;
+  bUserSelectFirstSound = _bUserSelectFirstSound;
+  uiFactorHQ = uiHQ;
+  uiFactorLQ = uiLQ;
+  setData(6, _memo);
+
+  factor.append(QString::number(uiFactorHQ));
+  factor.append(" vs ");
+  factor.append(QString::number(uiFactorLQ));
 }
 
 QString Result::getData(int idx) const {
@@ -69,7 +77,13 @@ QString Result::getData(int idx) const {
     case 1:
       return type == TEST_SAMPLINGRATE ? STRING_TEST_SAMPLINGRATE : STRING_TEST_BITDEPTH;
     case 2:
-      return bCorrect ? STRING_TEST_PASS : STRING_TEST_FAIL;
+      return factor;
+    case 3:
+      return bFirstSoundIsBetter ? STRING_TEST_FIRST : STRING_TEST_SECOND;
+    case 4:
+      return bFirstSoundIsBetter ? STRING_TEST_FIRST : STRING_TEST_SECOND;
+    case 5:
+      return memo;
   }
 
   return QString();
@@ -91,12 +105,29 @@ void Result::setData(int idx, QString &str) {
 
       break;
     case 2:
-      if (str.compare(STRING_TEST_PASS) == 0) {
-        bCorrect = true;
+      factor = str;
+
+      break;
+    case 3:
+      if (str.compare(STRING_TEST_FIRST) == 0) {
+        bFirstSoundIsBetter = true;
       }
-      else if (str.compare(STRING_TEST_FAIL) == 0) {
-        bCorrect = false;
+      else if (str.compare(STRING_TEST_SECOND) == 0) {
+        bFirstSoundIsBetter = false;
       }
+
+      break;
+    case 4:
+      if (str.compare(STRING_TEST_FIRST) == 0) {
+        bUserSelectFirstSound = true;
+      }
+      else if (str.compare(STRING_TEST_SECOND) == 0) {
+        bUserSelectFirstSound = false;
+      }
+
+      break;
+    case 5:
+      memo = str;
 
       break;
   }
@@ -110,7 +141,7 @@ int SongModel::rowCount(const QModelIndex &) const {
 }
 
 int SongModel::columnCount(const QModelIndex &) const {
-  return 3;
+  return 6;
 }
 
 QVariant SongModel::data(const QModelIndex &index, int role) const {
@@ -198,7 +229,13 @@ QVariant ResultModel::headerData(int section, Qt::Orientation orientation, int r
     case 1:
       return STRING_LIST_TESTTYPE;
     case 2:
-      return STRING_LIST_RESULT;
+      return STRING_LIST_TESTFACTOR;
+    case 3:
+      return STRING_LIST_ANSWER;
+    case 4:
+      return STRING_LIST_RESPONSE;
+    case 5:
+      return STRING_LIST_MEMO;
     default:
       return QVariant();
     }
@@ -229,7 +266,10 @@ bool ResultModel::saveList(QString &path) {
     // Write column names
     worksheet_write_string(ws, 0, 0, STRING_LIST_FILENAME, NULL);
     worksheet_write_string(ws, 0, 1, STRING_LIST_TESTTYPE, NULL);
-    worksheet_write_string(ws, 0, 2, STRING_LIST_RESULT, NULL);
+    worksheet_write_string(ws, 0, 2, STRING_LIST_TESTFACTOR, NULL);
+    worksheet_write_string(ws, 0, 3, STRING_LIST_ANSWER, NULL);
+    worksheet_write_string(ws, 0, 4, STRING_LIST_RESPONSE, NULL);
+    worksheet_write_string(ws, 0, 5, STRING_LIST_MEMO, NULL);
 
     // Write data
     int rowidx = 1;

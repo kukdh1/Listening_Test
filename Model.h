@@ -19,14 +19,17 @@
 
 #define STRING_TEST_SAMPLINGRATE      "Sampling Rate"
 #define STRING_TEST_BITDEPTH          "Bit Depth"
-#define STRING_TEST_PASS              "Pass"
-#define STRING_TEST_FAIL              "Fail"
+#define STRING_TEST_FIRST             "First"
+#define STRING_TEST_SECOND            "Second"
 
 #define STRING_LIST_FILENAME          "File Name"
 #define STRING_LIST_SAMPLINGRATE      "Sampling Rate (Hz)"
 #define STRING_LIST_BITDEPTH          "Bit Depth (bits)"
 #define STRING_LIST_TESTTYPE          "Test type"
-#define STRING_LIST_RESULT            "Result"
+#define STRING_LIST_TESTFACTOR        "Test factor"
+#define STRING_LIST_ANSWER            "Answer"
+#define STRING_LIST_RESPONSE          "Response"
+#define STRING_LIST_MEMO              "Memo"
 
 class Song {
   private:
@@ -55,10 +58,15 @@ class Result {
   private:
     QString filename;
     TEST_TYPE type;
-    bool bCorrect;
+    bool bFirstSoundIsBetter;
+    bool bUserSelectFirstSound;
+    uint32_t uiFactorHQ;
+    uint32_t uiFactorLQ;
+    QString memo;
+    QString factor;
 
   public:
-    Result(QString &, TEST_TYPE, bool);
+    Result(QString &, TEST_TYPE, bool, bool, uint32_t, uint32_t, QString &);
     Result();
 
     QString getData(int) const;
