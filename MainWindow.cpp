@@ -84,14 +84,15 @@ MainWindow::MainWindow(QWidget *parent)
       songModel.removeSong(list.at(0).row());
     }
   });
-  connect(ui.testSamplingRateButton, &QPushButton::clicked, [&]() {
+  connect(ui.testConfirmButton, &QPushButton::clicked, [&]() {
     if (session) {
       ProgressDialog progress;
+      
+      session->setTestInfo(ui.testTypeCombo->currentText().toStdString(), ui.hqAudioCombo->currentText().toStdString(), ui.lqAudioCombo->currentText().toStdString());
 
       progress.show();
 
       session->readSound();
-      session->convertSamplingrate();
 
       progress.close();
 
@@ -99,28 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
       ui.playButton_2->setEnabled(true);
       ui.selectSongButton_1->setEnabled(true);
       ui.selectSongButton_2->setEnabled(true);
-      ui.testSamplingRateButton->setEnabled(false);
-      ui.testBitDepthButton->setEnabled(false);
-    }
-  });
-  connect(ui.testBitDepthButton, &QPushButton::clicked, [&]() {
-    if (session) {
-      ProgressDialog progress;
-
-      progress.show();
-
-      session->readSound();
-      session->convertSamplingrate();
-      session->convertBitdepth();
-
-      progress.close();
-
-      ui.playButton_1->setEnabled(true);
-      ui.playButton_2->setEnabled(true);
-      ui.selectSongButton_1->setEnabled(true);
-      ui.selectSongButton_2->setEnabled(true);
-      ui.testSamplingRateButton->setEnabled(false);
-      ui.testBitDepthButton->setEnabled(false);
+      ui.testConfirmButton->setEnabled(false);
     }
   });
   connect(ui.playButton_1, &QPushButton::clicked, [&]() {
@@ -151,10 +131,15 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui.selectSongButton_1, &QPushButton::clicked, [&]() {
     if (session) {
-      bool result = session->isCorrectAnswer(true);
-      bool test = session->isSamplingrateTest();
+      bool answer;
+      bool testtype;
+      uint32_t factorH, factorL;
+      
+      session->getTestResult(answer);
+      session->getTestInfo(testtype, factorH, factorL);
+      
       QString filename = songModel.getItem(ui.fileTableView->selectionModel()->selectedRows().at(0).row()).getData(0);
-      Result item(filename, test ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, result);
+      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, true, factorH, factorL, QString());
 
       resultModel.appendResult(item);
       
@@ -193,10 +178,15 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui.selectSongButton_2, &QPushButton::clicked, [&]() {
     if (session) {
-      bool result = session->isCorrectAnswer(false);
-      bool test = session->isSamplingrateTest();
+      bool answer;
+      bool testtype;
+      uint32_t factorH, factorL;
+      
+      session->getTestResult(answer);
+      session->getTestInfo(testtype, factorH, factorL);
+      
       QString filename = songModel.getItem(ui.fileTableView->selectionModel()->selectedRows().at(0).row()).getData(0);
-      Result item(filename, test ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, result);
+      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, false, factorH, factorL, QString());
 
       resultModel.appendResult(item);
 
@@ -221,19 +211,20 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui.fileTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.count() == 0) {
       ui.deleteFileButton->setEnabled(false);
-      ui.testSamplingRateButton->setEnabled(false);
-      ui.testBitDepthButton->setEnabled(false);
+      ui.testConfirmButton->setEnabled(false);
       ui.playButton_1->setEnabled(false);
       ui.stopButton_1->setEnabled(false);
       ui.selectSongButton_1->setEnabled(false);
       ui.playButton_2->setEnabled(false);
       ui.stopButton_2->setEnabled(false);
       ui.selectSongButton_2->setEnabled(false);
+      ui.testTypeCombo->setEnabled(false);
+      ui.hqAudioCombo->setEnabled(false);
+      ui.lqAudioCombo->setEnabled(false);
     }
     else {
       ui.deleteFileButton->setEnabled(true);
-      ui.testSamplingRateButton->setEnabled(false);
-      ui.testBitDepthButton->setEnabled(false);
+      ui.testConfirmButton->setEnabled(false);
 
       SAFE_DELETE(session);
 
@@ -242,11 +233,25 @@ MainWindow::MainWindow(QWidget *parent)
       session = new SongSession(&audio);
       session->openSound(songModel.getItem(rowidx).getPath().toStdString().c_str());
 
-      if (session->enableSamplingrateTest()) {
-        ui.testSamplingRateButton->setEnabled(true);
+      ui.testTypeCombo->clear();
+      ui.hqAudioCombo->clear();
+      ui.lqAudioCombo->clear();
+      
+      std::vector<std::string> data;
+      
+      session->getTestTypes(data);
+      for (auto value : data) {
+        ui.testTypeCombo->addItem(QString::fromStdString(value));
       }
-      if (session->enableBitdepthTest()) {
-        ui.testBitDepthButton->setEnabled(true);
+      
+      session->getHQFactors(data);
+      for (auto value : data) {
+        ui.hqAudioCombo->addItem(QString::fromStdString(value));
+      }
+      
+      session->getLQFactors(data);
+      for (auto value : data) {
+        ui.lqAudioCombo->addItem(QString::fromStdString(value));
       }
     }
   });
@@ -265,6 +270,14 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
 
+      std::function<void(int)> fctComboHandler = [&](int index) {
+        
+      };
+      
+      connect(ui.testTypeCombo, &QComboBox::currentIndexChanged, fctComboHandler);
+      connect(ui.hqAudioCombo, &QComboBox::currentIndexChanged, fctComboHandler);
+      connect(ui.lqAudioCombo, &QComboBox::currentIndexChanged, fctComboHandler);
+  
   // Begin timer
   timer.start(1000);
 
@@ -277,8 +290,9 @@ MainWindow::MainWindow(QWidget *parent)
   ui.stopButton_2->setEnabled(false);
   ui.selectSongButton_2->setEnabled(false);
   ui.timeSlider->setEnabled(false);
-  ui.testSamplingRateButton->setEnabled(false);
-  ui.testBitDepthButton->setEnabled(false);
+  ui.testConfirmButton->setEnabled(false);
+  ui.hqAudioCombo->setEnabled(false);
+  ui.lqAudioCombo->setEnabled(false);
 
   // Set label
   ui.currentFileLabel->setText(STRING_UI_FILE_NOT_SELECTED);

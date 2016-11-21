@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <exception>
+#include <vector>
 #include <time.h>
 #include <portaudio.h>
 
@@ -48,15 +49,14 @@ class SongSession {
     uint32_t byte_per_sample;
     std::string *current_data;
 
-    std::string data_192_24;  // Buffer for 192/96 kHz 24Bit audio
-    std::string data_48_24;
-    std::string data_48_8;
-
-    bool bSampleRateTest;
-    bool bBitDepthTest;
+    std::string data_original;
+    std::string data_hq;
+    std::string data_lq;
 
     bool bFirstSoundIsBetter;
     bool bTestingSamplerate;
+    uint32_t uiFactorHQ;
+    uint32_t uiFactorLQ;
 
     static int fill_audio(const void *, void *, unsigned long, const PaStreamCallbackTimeInfo *, PaStreamCallbackFlags, void *);
     uint32_t msToSample(uint32_t);
@@ -66,18 +66,20 @@ class SongSession {
     SongSession(AudioSystem *);
     ~SongSession();
 
+    void getTestTypes(std::vector<std::string> &);
+    void getHQFactors(std::vector<std::string> &);
+    void getLQFactors(std::vector<std::string> &);
+  
+    void getTestInfo(bool &, uint32_t &, uint32_t &);
+    void setTestInfo(std::string, std::string, std::string);
+  
     void sineWaveTest();
 
     bool openSound(const char *);
     bool readSound();
-    bool enableSamplingrateTest();
-    bool enableBitdepthTest();
 
     uint32_t getSamplingrate();
     uint8_t getBitdepth();
-
-    void convertSamplingrate();
-    void convertBitdepth();
 
     bool startPlaying(bool);
     bool isInited();
@@ -88,8 +90,7 @@ class SongSession {
     void getTimeInfo(uint32_t &, uint32_t &);
     void setTime(uint32_t);
     
-    bool isCorrectAnswer(bool);
-    bool isSamplingrateTest();
+    void getTestResult(bool &);
 };
 
 #endif
