@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Listening_TestClass</class>
  <widget class="QMainWindow" name="Listening_TestClass">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,6 +12,18 @@
     <width>791</width>
     <height>721</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>791</width>
+    <height>721</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>791</width>
+    <height>721</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Cognitive Acoustics Project</string>
