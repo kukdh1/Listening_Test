@@ -11,12 +11,18 @@
 #include <time.h>
 #include <portaudio.h>
 
+#include "Model.h"
+
 extern "C" {
   #include <libavcodec/avcodec.h>
   #include <libavformat/avformat.h>
 }
 
 #define MAX_AUDIO_FRAME_SIZE    192000
+
+#define STRING_COMBO_TESTTYPE   "<Test Type>"
+#define STRING_COMBO_HQ_AUDIO   "<HQ Audio Factor>"
+#define STRING_COMBO_LQ_AUDIO   "<LQ Audio Factor>"
 
 #ifdef _WIN32
 #pragma comment(lib, "avutil.lib")
@@ -41,6 +47,7 @@ class SongSession {
     uint32_t stream_id;
     uint32_t samplingrate;
     uint32_t channel_count;
+    uint32_t bitdepth;
 
     uint32_t audio_index;
     PaStreamParameters spec;
@@ -62,6 +69,9 @@ class SongSession {
     uint32_t msToSample(uint32_t);
     uint32_t sampleToMs(uint32_t);
 
+    static void convertSamplingRate(std::string &, std::string &, uint32_t, uint32_t, uint32_t);
+    static void convertBitdepth(std::string &, std::string &, uint32_t, uint32_t, uint32_t);
+
   public:
     SongSession(AudioSystem *);
     ~SongSession();
@@ -71,7 +81,8 @@ class SongSession {
     void getLQFactors(std::vector<std::string> &);
   
     void getTestInfo(bool &, uint32_t &, uint32_t &);
-    void setTestInfo(std::string, std::string, std::string);
+    bool setTestType(std::string);
+    bool setTestInfo(std::string, std::string);
   
     void sineWaveTest();
 

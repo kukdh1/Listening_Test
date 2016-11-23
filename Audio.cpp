@@ -53,14 +53,14 @@ bool AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bi
 SongSession::SongSession(AudioSystem *_pSystem) {
   pSystem = _pSystem;
 
-  bBitDepthTest = false;
-  bSampleRateTest = false;
-
   avf_context = NULL;
   current_stream = NULL;
   stream_id = UINT_MAX;
   current_freq = 0;
   audio_index = 0;
+  bitdepth = 0;
+  samplingrate = 0;
+  channel_count = 0;
 }
 
 SongSession::~SongSession() {
@@ -74,6 +74,74 @@ SongSession::~SongSession() {
   }
 }
 
+void SongSession::getTestTypes(std::vector<std::string> &data) {
+  data.clear();
+
+  data.push_back(STRING_COMBO_TESTTYPE);
+  data.push_back(STRING_LIST_SAMPLINGRATE);
+  data.push_back(STRING_LIST_BITDEPTH);
+}
+
+void SongSession::getHQFactors(std::vector<std::string> &data) {
+  data.clear();
+
+  data.push_back(STRING_COMBO_HQ_AUDIO);
+
+  if (bTestingSamplerate) {
+    for (uint32_t i = samplingrate; i >= 24000; i /= 2) {
+      data.push_back(std::to_string(i));
+    }
+  }
+  else {
+    data.push_back("24");
+    data.push_back("16");
+  }
+}
+
+void SongSession::getLQFactors(std::vector<std::string> &data) {
+  data.clear();
+
+  data.push_back(STRING_COMBO_LQ_AUDIO);
+
+  if (bTestingSamplerate) {
+    for (uint32_t i = samplingrate / 2; i >= 12000; i /= 2) {
+      data.push_back(std::to_string(i));
+    }
+  }
+  else {
+    data.push_back("16");
+    data.push_back("8");
+  }
+}
+
+bool SongSession::setTestType(std::string testtype) {
+  if (testtype.compare(STRING_LIST_SAMPLINGRATE) == 0) {
+    bTestingSamplerate = true;
+
+    return true;
+  }
+  else if (testtype.compare(STRING_LIST_BITDEPTH) == 0) {
+    bTestingSamplerate = false;
+
+    return true;
+  }
+
+  return false;
+}
+
+void SongSession::getTestInfo(bool &testtype, uint32_t &hqFactor, uint32_t &lqFactor) {
+  testtype = bTestingSamplerate;
+  hqFactor = uiFactorHQ;
+  lqFactor = uiFactorLQ;
+}
+
+bool SongSession::setTestInfo(std::string hqFactor, std::string lqFactor) {
+  uiFactorHQ = atol(hqFactor.c_str());
+  uiFactorLQ = atol(lqFactor.c_str());
+
+  return uiFactorHQ > uiFactorLQ;
+}
+
 void SongSession::sineWaveTest() {
   // Create sine wave (1sec)
   current_freq = 192000;
@@ -82,15 +150,15 @@ void SongSession::sineWaveTest() {
   spec.channelCount = 1;
   spec.suggestedLatency = Pa_GetDeviceInfo(spec.device)->defaultLowOutputLatency;
   spec.sampleFormat = paUInt8;
-  current_data = &data_192_24;
+  current_data = &data_original;
   byte_per_sample = 1;
   uint32_t buffersize = current_freq * spec.channelCount / 10;
 
   // Create buffer
-  data_192_24.resize(current_freq);
+  data_original.resize(current_freq);
 
   for (uint32_t i = 0; i < current_freq; i++) {
-    data_192_24.at(i) = i % 2 ? 0x40 : 0xC0;
+    data_original.at(i) = i % 2 ? 0x40 : 0xC0;
   }
 
   // Play sinewave for 1 sec
@@ -110,14 +178,9 @@ bool SongSession::openSound(const char *filepath) {
   result = avformat_open_input(&avf_context, filepath, NULL, NULL) >= 0;
 
   if (result) {
-    float freq;
-    int bits;
-
     result = avformat_find_stream_info(avf_context, NULL) >= 0;
 
     if (result) {
-      int bits;
-
       for (unsigned int i = 0; i < avf_context->nb_streams; i++) {
         if (avf_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
           stream_id = i;
@@ -127,15 +190,8 @@ bool SongSession::openSound(const char *filepath) {
 
       if (stream_id != UINT_MAX) {
         samplingrate = (uint32_t)avf_context->streams[stream_id]->codecpar->sample_rate;
-        bits = avf_context->streams[stream_id]->codecpar->bits_per_raw_sample;
+        bitdepth = (uint32_t)avf_context->streams[stream_id]->codecpar->bits_per_raw_sample;
         channel_count = (uint32_t)avf_context->streams[stream_id]->codecpar->channels;
-
-        if (bits == 24) {
-          bBitDepthTest = true;
-
-          if (samplingrate == 96000 || samplingrate == 192000)
-            bSampleRateTest = true;
-        }
       }
       else {
         result = false;
@@ -149,101 +205,116 @@ bool SongSession::openSound(const char *filepath) {
 bool SongSession::readSound() {
   bool result = false;
 
-  if (avf_context) {
-    if (bBitDepthTest || bSampleRateTest) {
-      AVPacket packet;
-      AVFrame *frame;
-      AVCodecParameters *cpar;
-      AVCodecContext *ctx;
-      AVCodec *codec;
-      std::string buffer;
-      std::string *data;
+  if (avf_context && bitdepth == 24) {
+    AVPacket packet;
+    AVFrame *frame;
+    AVCodecParameters *cpar;
+    AVCodecContext *ctx;
+    AVCodec *codec;
+    std::string buffer;
 
-      buffer.resize(MAX_AUDIO_FRAME_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
+    buffer.resize(MAX_AUDIO_FRAME_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
 
-      if (bSampleRateTest)
-        data = &data_192_24;
-      else
-        data = &data_48_24;
+    cpar = avf_context->streams[stream_id]->codecpar;
+    ctx = avcodec_alloc_context3(NULL);
 
-      cpar = avf_context->streams[stream_id]->codecpar;
-      ctx = avcodec_alloc_context3(NULL);
+    if (ctx == NULL) {
+      goto READ_SOUND_CLEANUP;
+    }
 
-      if (ctx == NULL) {
-        goto READ_SOUND_CLEANUP;
-      }
+    if (avcodec_parameters_to_context(ctx, cpar) < 0) {
+      avcodec_free_context(&ctx);
+      goto READ_SOUND_CLEANUP;
+    }
 
-      if (avcodec_parameters_to_context(ctx, cpar) < 0) {
-        avcodec_free_context(&ctx);
-        goto READ_SOUND_CLEANUP;
-      }
+    codec = avcodec_find_decoder(ctx->codec_id);
 
-      codec = avcodec_find_decoder(ctx->codec_id);
+    if (codec == NULL) {
+      avcodec_free_context(&ctx);
+      goto READ_SOUND_CLEANUP;
+    }
 
-      if (codec == NULL) {
-        avcodec_free_context(&ctx);
-        goto READ_SOUND_CLEANUP;
-      }
+    if (avcodec_open2(ctx, codec, NULL) < 0) {
+      avcodec_free_context(&ctx);
+      goto READ_SOUND_CLEANUP;
+    }
 
-      if (avcodec_open2(ctx, codec, NULL) < 0) {
-        avcodec_free_context(&ctx);
-        goto READ_SOUND_CLEANUP;
-      }
+    frame = av_frame_alloc();
 
-      frame = av_frame_alloc();
-
-      packet.data = (uint8_t *)buffer.c_str();
-      packet.size = buffer.size();
+    packet.data = (uint8_t *)buffer.c_str();
+    packet.size = buffer.size();
       
-      int len;
-      int frame_ptr;
-      while (true) {
-        av_init_packet(&packet);
+    int len;
+    int frame_ptr;
+    while (true) {
+      av_init_packet(&packet);
 
-        if (av_read_frame(avf_context, &packet) < 0) {
+      if (av_read_frame(avf_context, &packet) < 0) {
+        break;
+      }
+
+      if (packet.stream_index == stream_id) {
+        frame_ptr = 0;
+
+        if (avcodec_send_packet(ctx, &packet) < 0) {
           break;
         }
 
-        if (packet.stream_index == stream_id) {
-          frame_ptr = 0;
+        len = avcodec_receive_frame(ctx, frame);
 
-          if (avcodec_send_packet(ctx, &packet) < 0) {
-            break;
-          }
-
-          len = avcodec_receive_frame(ctx, frame);
-
-          if (len < 0 && len != AVERROR(EAGAIN) && len != AVERROR_EOF) {
-            break;
-          }
-          if (len >= 0) {
-            frame_ptr = 1;
-          }
-
-          if (frame_ptr) {
-            // libavcodec provide 32bit sample for 24bit audio
-            int sample_size = frame->linesize[0] / 4;
-            int beginidx = data->size();
-            data->append(sample_size * 3, NULL);
-
-            for (int i = 0; i < sample_size; i++) {
-              memcpy((char *)data->c_str() + beginidx + i * 3, frame->extended_data[0] + i * 4 + 1, 3);
-            }
-          }
-
-          av_frame_unref(frame);  // av_read_frame
+        if (len < 0 && len != AVERROR(EAGAIN) && len != AVERROR_EOF) {
+          break;
+        }
+        if (len >= 0) {
+          frame_ptr = 1;
         }
 
-        av_packet_unref(&packet); // av_init_packet
+        if (frame_ptr) {
+          // libavcodec provide 32bit sample for 24bit audio
+          int sample_size = frame->linesize[0] / 4;
+          int beginidx = data_original.size();
+          data_original.append(sample_size * 3, NULL);
+
+          for (int i = 0; i < sample_size; i++) {
+            memcpy((char *)data_original.c_str() + beginidx + i * 3, frame->extended_data[0] + i * 4 + 1, 3);
+          }
+        }
+
+        av_frame_unref(frame);  // av_read_frame
       }
 
-      av_frame_free(&frame);      // av_frame_alloc
-      avcodec_close(ctx);         // avcodec_open2
-      avcodec_free_context(&ctx); // avcodec_alloc_context3
+      av_packet_unref(&packet); // av_init_packet
+    }
+
+    av_frame_free(&frame);      // av_frame_alloc
+    avcodec_close(ctx);         // avcodec_open2
+    avcodec_free_context(&ctx); // avcodec_alloc_context3
+
+    // Make data_hq and data_lq
+    bFirstSoundIsBetter = rand() % 2;
+
+    if (bTestingSamplerate) {
+      if (uiFactorHQ != samplingrate) {
+        convertSamplingRate(data_original, data_hq, samplingrate, uiFactorHQ, channel_count);
+      }
+      else {
+        data_hq = data_original;
+      }
+
+      convertSamplingRate(data_original, data_lq, samplingrate, uiFactorLQ, channel_count);
     }
     else {
-      goto READ_SOUND_CLEANUP;
+      if (uiFactorHQ != bitdepth) {
+        convertBitdepth(data_original, data_hq, bitdepth, uiFactorHQ, channel_count);
+      }
+      else {
+        data_hq = data_original;
+      }
+
+      convertBitdepth(data_original, data_lq, bitdepth, uiFactorLQ, channel_count);
     }
+
+    data_original.clear();
 
     result = true;
   }
@@ -255,53 +326,12 @@ READ_SOUND_CLEANUP:
   return result;
 }
 
-bool SongSession::enableSamplingrateTest() {
-  return bSampleRateTest;
-}
-
-bool SongSession::enableBitdepthTest() {
-  return bBitDepthTest;
-}
-
 uint32_t SongSession::getSamplingrate() {
   return samplingrate;
 }
 
 uint8_t SongSession::getBitdepth() {
   return 24;
-}
-
-void SongSession::convertSamplingrate() {
-  bFirstSoundIsBetter = rand() % 2;
-  bTestingSamplerate = true;
-
-  if (bSampleRateTest && data_48_24.size() == 0) {
-    uint32_t step = samplingrate / 48000;
-    uint32_t count = data_192_24.size();
-    uint32_t samplesize = 3 * channel_count;
-
-    data_48_24.resize(count / step);
-    count = data_48_24.size() / samplesize; // samples
-
-    for (uint32_t i = 0; i < count; i ++) {
-      memcpy((char *)data_48_24.c_str() + i * samplesize, data_192_24.c_str() + i * step * samplesize, samplesize);
-    }
-  }
-}
-
-void SongSession::convertBitdepth() {
-  bTestingSamplerate = false;
-
-  if (bBitDepthTest && data_48_8.size() == 0) {
-    uint32_t count = data_48_24.size();
-
-    data_48_8.resize(data_48_24.size() / 3);
-    count = data_48_8.size(); // samples
-
-    for (uint32_t i = 0; i < count; i++) {
-      data_48_8.at(i) = data_48_24.at(i * 3 + 2) + 0x80;
-    }
-  }
 }
 
 bool SongSession::startPlaying(bool bFirst) {
@@ -317,32 +347,16 @@ bool SongSession::startPlaying(bool bFirst) {
   spec.suggestedLatency = Pa_GetDeviceInfo(spec.device)->defaultLowOutputLatency;
 
   if (bFirstSoundIsBetter ^ bFirst) { // play low quality
-    if (bTestingSamplerate) {
-      current_data = &data_48_24;
-      byte_per_sample = 3;
-      current_freq = 48000;
-      spec.sampleFormat = paInt24;
-    }
-    else {
-      current_data = &data_48_8;
-      byte_per_sample = 1;
-      current_freq = 48000;
-      spec.sampleFormat = paUInt8;
-    }
+    current_data = &data_lq;
+    byte_per_sample = bTestingSamplerate ? 3 : (uiFactorLQ >> 3);
+    current_freq = bTestingSamplerate ? uiFactorLQ : samplingrate;
+    spec.sampleFormat = byte_per_sample == 3 ? paInt24 : (byte_per_sample == 2 ? paInt16 : paUInt8);
   }
   else {
-    if (bTestingSamplerate) {
-      current_data = &data_192_24;
-      byte_per_sample = 3;
-      current_freq = samplingrate;
-      spec.sampleFormat = paInt24;
-    }
-    else {
-      current_data = &data_48_24;
-      byte_per_sample = 3;
-      current_freq = 48000;
-      spec.sampleFormat = paInt24;
-    }
+    current_data = &data_hq;
+    byte_per_sample = bTestingSamplerate ? 3 : (uiFactorHQ >> 3);
+    current_freq = bTestingSamplerate ? uiFactorHQ : samplingrate;
+    spec.sampleFormat = byte_per_sample == 3 ? paInt24 : (byte_per_sample == 2 ? paInt16 : paUInt8);
   }
 
   // Buffer as 0.1sec
@@ -404,12 +418,8 @@ uint32_t SongSession::sampleToMs(uint32_t sample) {
   return (uint32_t)(sample / samples_per_second * 1000.f + 0.5f);
 }
 
-bool SongSession::isCorrectAnswer(bool bSelected) {
-  return bFirstSoundIsBetter == bSelected;
-}
-
-bool SongSession::isSamplingrateTest() {
-  return bTestingSamplerate;
+void SongSession::getTestResult(bool &answer) {
+  answer = bFirstSoundIsBetter;
 }
 
 int SongSession::fill_audio(const void *inbuf, void *outbuf, unsigned long frames_per_buf, const PaStreamCallbackTimeInfo* time, PaStreamCallbackFlags flags, void *userdata) {
@@ -430,4 +440,36 @@ int SongSession::fill_audio(const void *inbuf, void *outbuf, unsigned long frame
   pThis->audio_index += byte_to_copy;
 
   return paContinue;
+}
+
+void SongSession::convertSamplingRate(std::string &src, std::string &dst, uint32_t src_freq, uint32_t dst_freq, uint32_t channel) {
+  uint32_t step = src_freq / dst_freq;    // Always integer
+  uint32_t count = src.size();
+  uint32_t samplesize = 3 * channel;
+
+  dst.resize(count / step);
+  count = dst.size() / samplesize; // samples
+
+  for (uint32_t i = 0; i < count; i++) {
+    memcpy((char *)dst.c_str() + i * samplesize, src.c_str() + i * step * samplesize, samplesize);
+  }
+}
+
+void SongSession::convertBitdepth(std::string &src, std::string &dst, uint32_t src_bits, uint32_t dst_bits, uint32_t channel) {
+  uint32_t count = src.size();
+  uint32_t dst_samplesize = dst_bits >> 3;
+  uint32_t src_samplesize = src_bits >> 3;
+
+  dst.resize(src.size() * dst_samplesize / src_samplesize);
+  count = dst.size() / dst_samplesize; // samples
+
+  for (uint32_t i = 0; i < count; i++) {
+    memcpy((char *)dst.c_str() + i * dst_samplesize, src.c_str() + i * src_samplesize + (src_samplesize - dst_samplesize), dst_samplesize);
+  }
+
+  if (dst_samplesize == 1) {
+    for (uint32_t i = 0; i < count; i++) {
+      dst.at(i) += 0x80;
+    }
+  }
 }

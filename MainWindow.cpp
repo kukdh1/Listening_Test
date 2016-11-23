@@ -16,7 +16,11 @@ MainWindow::MainWindow(QWidget *parent)
   // Assign model for result list
   ui.resultTableView->setModel(&resultModel);
   ui.resultTableView->setColumnWidth(0, 480);
-  ui.resultTableView->setColumnWidth(1, 150);
+  ui.resultTableView->setColumnWidth(1, 100);
+  ui.resultTableView->setColumnWidth(2, 170);
+  ui.resultTableView->setColumnWidth(3, 80);
+  ui.resultTableView->setColumnWidth(4, 80);
+  ui.resultTableView->setColumnWidth(5, 200);
 
   // Connect handler
   connect(&timer, &QTimer::timeout, [&]() {
@@ -88,19 +92,22 @@ MainWindow::MainWindow(QWidget *parent)
     if (session) {
       ProgressDialog progress;
       
-      session->setTestInfo(ui.testTypeCombo->currentText().toStdString(), ui.hqAudioCombo->currentText().toStdString(), ui.lqAudioCombo->currentText().toStdString());
+      if (session->setTestInfo(ui.hqAudioCombo->currentText().toStdString(), ui.lqAudioCombo->currentText().toStdString())) {
+        progress.show();
 
-      progress.show();
+        session->readSound();
 
-      session->readSound();
+        progress.close();
 
-      progress.close();
-
-      ui.playButton_1->setEnabled(true);
-      ui.playButton_2->setEnabled(true);
-      ui.selectSongButton_1->setEnabled(true);
-      ui.selectSongButton_2->setEnabled(true);
-      ui.testConfirmButton->setEnabled(false);
+        ui.playButton_1->setEnabled(true);
+        ui.playButton_2->setEnabled(true);
+        ui.selectSongButton_1->setEnabled(true);
+        ui.selectSongButton_2->setEnabled(true);
+        ui.testConfirmButton->setEnabled(false);
+        ui.testTypeCombo->setEnabled(false);
+        ui.hqAudioCombo->setEnabled(false);
+        ui.lqAudioCombo->setEnabled(false);
+      }
     }
   });
   connect(ui.playButton_1, &QPushButton::clicked, [&]() {
@@ -142,12 +149,20 @@ MainWindow::MainWindow(QWidget *parent)
       Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, true, factorH, factorL, QString());
 
       resultModel.appendResult(item);
+
+      session->stopPlaying();
       
       ui.timeSlider->setEnabled(false);
+      ui.testConfirmButton->setEnabled(false);
       ui.playButton_1->setEnabled(false);
+      ui.stopButton_1->setEnabled(false);
       ui.selectSongButton_1->setEnabled(false);
       ui.playButton_2->setEnabled(false);
+      ui.stopButton_2->setEnabled(false);
       ui.selectSongButton_2->setEnabled(false);
+      ui.testTypeCombo->setEnabled(false);
+      ui.hqAudioCombo->setEnabled(false);
+      ui.lqAudioCombo->setEnabled(false);
     }
   });
   connect(ui.playButton_2, &QPushButton::clicked, [&]() {
@@ -190,11 +205,19 @@ MainWindow::MainWindow(QWidget *parent)
 
       resultModel.appendResult(item);
 
+      session->stopPlaying();
+
       ui.timeSlider->setEnabled(false);
+      ui.testConfirmButton->setEnabled(false);
       ui.playButton_1->setEnabled(false);
+      ui.stopButton_1->setEnabled(false);
       ui.selectSongButton_1->setEnabled(false);
       ui.playButton_2->setEnabled(false);
+      ui.stopButton_2->setEnabled(false);
       ui.selectSongButton_2->setEnabled(false);
+      ui.testTypeCombo->setEnabled(false);
+      ui.hqAudioCombo->setEnabled(false);
+      ui.lqAudioCombo->setEnabled(false);
     }
   });
   connect(ui.saveResultButton, &QPushButton::clicked, [&]() {
@@ -209,6 +232,8 @@ MainWindow::MainWindow(QWidget *parent)
     resultModel.resetList();
   });
   connect(ui.fileTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection &selected, const QItemSelection &deselected) {
+    Q_UNUSED(deselected);
+    
     if (selected.count() == 0) {
       ui.deleteFileButton->setEnabled(false);
       ui.testConfirmButton->setEnabled(false);
@@ -234,24 +259,13 @@ MainWindow::MainWindow(QWidget *parent)
       session->openSound(songModel.getItem(rowidx).getPath().toStdString().c_str());
 
       ui.testTypeCombo->clear();
-      ui.hqAudioCombo->clear();
-      ui.lqAudioCombo->clear();
+      ui.testTypeCombo->setEnabled(true);
       
       std::vector<std::string> data;
       
       session->getTestTypes(data);
       for (auto value : data) {
         ui.testTypeCombo->addItem(QString::fromStdString(value));
-      }
-      
-      session->getHQFactors(data);
-      for (auto value : data) {
-        ui.hqAudioCombo->addItem(QString::fromStdString(value));
-      }
-      
-      session->getLQFactors(data);
-      for (auto value : data) {
-        ui.lqAudioCombo->addItem(QString::fromStdString(value));
       }
     }
   });
@@ -270,13 +284,48 @@ MainWindow::MainWindow(QWidget *parent)
     }
   });
 
-      std::function<void(int)> fctComboHandler = [&](int index) {
-        
-      };
-      
-      connect(ui.testTypeCombo, &QComboBox::currentIndexChanged, fctComboHandler);
-      connect(ui.hqAudioCombo, &QComboBox::currentIndexChanged, fctComboHandler);
-      connect(ui.lqAudioCombo, &QComboBox::currentIndexChanged, fctComboHandler);
+  std::function<void(const QString &)> fctComboHandler = [&](const QString &index) {
+    Q_UNUSED(index);
+
+    if (ui.testTypeCombo->currentIndex() > 0 && ui.hqAudioCombo->currentIndex() > 0 && ui.lqAudioCombo->currentIndex() > 0) {
+      ui.testConfirmButton->setEnabled(true);
+    }
+    else {
+      ui.testConfirmButton->setEnabled(false);
+    }
+  };
+  
+  connect(ui.testTypeCombo, &QComboBox::currentTextChanged, [&](const QString &index) {
+    if (session) {
+      if (session->setTestType(index.toStdString())) {
+        std::vector<std::string> data;
+
+        ui.hqAudioCombo->clear();
+        ui.lqAudioCombo->clear();
+        ui.hqAudioCombo->setEnabled(true);
+        ui.lqAudioCombo->setEnabled(true);
+
+        session->getHQFactors(data);
+        for (auto value : data) {
+          ui.hqAudioCombo->addItem(QString::fromStdString(value));
+        }
+
+        session->getLQFactors(data);
+        for (auto value : data) {
+          ui.lqAudioCombo->addItem(QString::fromStdString(value));
+        }
+
+        ui.hqAudioCombo->setEnabled(true);
+        ui.lqAudioCombo->setEnabled(true);
+      }
+      else {
+        ui.hqAudioCombo->setEnabled(false);
+        ui.lqAudioCombo->setEnabled(false);
+      }
+    }
+  });
+  connect(ui.hqAudioCombo, &QComboBox::currentTextChanged, fctComboHandler);
+  connect(ui.lqAudioCombo, &QComboBox::currentTextChanged, fctComboHandler);
   
   // Begin timer
   timer.start(1000);
@@ -291,6 +340,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui.selectSongButton_2->setEnabled(false);
   ui.timeSlider->setEnabled(false);
   ui.testConfirmButton->setEnabled(false);
+  ui.testTypeCombo->setEnabled(false);
   ui.hqAudioCombo->setEnabled(false);
   ui.lqAudioCombo->setEnabled(false);
 
