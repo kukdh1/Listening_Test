@@ -140,7 +140,7 @@
        <x>10</x>
        <y>20</y>
        <width>101</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -153,7 +153,7 @@
        <x>110</x>
        <y>20</y>
        <width>71</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -166,7 +166,7 @@
        <x>210</x>
        <y>20</y>
        <width>161</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -192,7 +192,7 @@
        <x>10</x>
        <y>20</y>
        <width>101</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -205,7 +205,7 @@
        <x>110</x>
        <y>20</y>
        <width>71</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -218,7 +218,7 @@
        <x>210</x>
        <y>20</y>
        <width>161</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -264,7 +264,7 @@
       <x>600</x>
       <y>680</y>
       <width>181</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -277,7 +277,7 @@
       <x>424</x>
       <y>680</y>
       <width>171</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -303,7 +303,7 @@
       <x>10</x>
       <y>250</y>
       <width>221</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
    </widget>
@@ -313,7 +313,7 @@
       <x>240</x>
       <y>250</y>
       <width>211</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
    </widget>
@@ -323,7 +323,7 @@
       <x>460</x>
       <y>250</y>
       <width>211</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
    </widget>
@@ -333,7 +333,7 @@
       <x>680</x>
       <y>250</y>
       <width>101</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
