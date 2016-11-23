@@ -31,6 +31,9 @@
 #define STRING_LIST_RESPONSE          "Response"
 #define STRING_LIST_MEMO              "Memo"
 
+#define COLUMN_COUNT_SONG             3
+#define COLUMN_COUNT_RESULT           6
+
 class Song {
   private:
     QString filepath;
@@ -91,20 +94,22 @@ class SongModel : public QAbstractTableModel {
 };
 
 class ResultModel : public QAbstractTableModel {
-private:
-  std::vector<Result> vResults;
+  private:
+    std::vector<Result> vResults;
 
-public:
-  ResultModel(QObject *parent = NULL);
+  public:
+    ResultModel(QObject *parent = NULL);
 
-  int rowCount(const QModelIndex &) const override;
-  int columnCount(const QModelIndex &) const override;
-  QVariant data(const QModelIndex &, int) const override;
-  QVariant headerData(int, Qt::Orientation, int) const override;
+    int rowCount(const QModelIndex &) const override;
+    int columnCount(const QModelIndex &) const override;
+    QVariant data(const QModelIndex &, int) const override;
+    QVariant headerData(int, Qt::Orientation, int) const override;
+    bool setData(const QModelIndex &, const QVariant &, int role = Qt::EditRole) override;
+    Qt::ItemFlags flags(const QModelIndex &) const override;
 
-  void appendResult(Result &);
-  void resetList();
-  bool saveList(QString &);
+    void appendResult(Result &);
+    void resetList();
+    bool saveList(QString &);
 };
 
 #endif

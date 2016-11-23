@@ -141,7 +141,7 @@ int SongModel::rowCount(const QModelIndex &) const {
 }
 
 int SongModel::columnCount(const QModelIndex &) const {
-  return 6;
+  return COLUMN_COUNT_SONG;
 }
 
 QVariant SongModel::data(const QModelIndex &index, int role) const {
@@ -206,7 +206,7 @@ int ResultModel::rowCount(const QModelIndex &) const {
 }
 
 int ResultModel::columnCount(const QModelIndex &) const {
-  return 3;
+  return COLUMN_COUNT_RESULT;
 }
 
 QVariant ResultModel::data(const QModelIndex &index, int role) const {
@@ -245,6 +245,24 @@ QVariant ResultModel::headerData(int section, Qt::Orientation orientation, int r
   }
 }
 
+bool ResultModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+  if (role == Qt::EditRole) {
+    if (index.column() == 5) {
+      vResults.at(index.row()).setData(5, value.toString());
+    }
+  }
+
+  return true;
+}
+
+Qt::ItemFlags ResultModel::flags(const QModelIndex &index) const {
+  if (index.column() == 5) {
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  }
+
+  return QAbstractTableModel::flags(index);
+}
+
 void ResultModel::appendResult(Result & result) {
   beginInsertRows(QModelIndex{}, vResults.size(), vResults.size());
   vResults.push_back(result);
@@ -275,7 +293,7 @@ bool ResultModel::saveList(QString &path) {
     int rowidx = 1;
 
     for (auto result : vResults) {
-      for (int i = 0; i < 3; i++)
+      for (int i = 0; i < COLUMN_COUNT_RESULT; i++)
         worksheet_write_string(ws, rowidx, i, result.getData(i).toStdString().c_str(), NULL);
     
       rowidx++;
