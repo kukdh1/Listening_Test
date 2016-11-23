@@ -181,7 +181,7 @@ void SongModel::appendSong(Song &song) {
 }
 
 void SongModel::removeSong(int idx) {
-  if (idx >= vSongs.size()) {
+  if ((size_t)idx >= vSongs.size()) {
     return;
   }
 
@@ -191,7 +191,7 @@ void SongModel::removeSong(int idx) {
 }
 
 Song SongModel::getItem(int idx) {
-  if (idx >= vSongs.size()) {
+  if ((size_t)idx >= vSongs.size()) {
     return Song();
   }
 
@@ -248,7 +248,8 @@ QVariant ResultModel::headerData(int section, Qt::Orientation orientation, int r
 bool ResultModel::setData(const QModelIndex &index, const QVariant &value, int role) {
   if (role == Qt::EditRole) {
     if (index.column() == 5) {
-      vResults.at(index.row()).setData(5, value.toString());
+      QString str = value.toString();
+      vResults.at(index.row()).setData(5, str);
     }
   }
 

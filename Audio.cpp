@@ -19,9 +19,6 @@ bool AudioSystem::getInfo(std::string &path, uint32_t &samplingrate, uint8_t &bi
   result = avformat_open_input(&avf_context, path.c_str(), NULL, NULL) >= 0;
 
   if (result) {
-    float freq;
-    int bits;
-
     result = avformat_find_stream_info(avf_context, NULL) >= 0;
 
     if (result) {
@@ -253,7 +250,7 @@ bool SongSession::readSound() {
         break;
       }
 
-      if (packet.stream_index == stream_id) {
+      if ((uint32_t)packet.stream_index == stream_id) {
         frame_ptr = 0;
 
         if (avcodec_send_packet(ctx, &packet) < 0) {
@@ -305,13 +302,13 @@ bool SongSession::readSound() {
     }
     else {
       if (uiFactorHQ != bitdepth) {
-        convertBitdepth(data_original, data_hq, bitdepth, uiFactorHQ, channel_count);
+        convertBitdepth(data_original, data_hq, bitdepth, uiFactorHQ);
       }
       else {
         data_hq = data_original;
       }
 
-      convertBitdepth(data_original, data_lq, bitdepth, uiFactorLQ, channel_count);
+      convertBitdepth(data_original, data_lq, bitdepth, uiFactorLQ);
     }
 
     data_original.clear();
@@ -423,6 +420,11 @@ void SongSession::getTestResult(bool &answer) {
 }
 
 int SongSession::fill_audio(const void *inbuf, void *outbuf, unsigned long frames_per_buf, const PaStreamCallbackTimeInfo* time, PaStreamCallbackFlags flags, void *userdata) {
+  Q_UNUSED(inbuf);
+  Q_UNUSED(time);
+  Q_UNUSED(flags);
+  Q_UNUSED(userdata);
+  
   SongSession *pThis = (SongSession *)userdata;
   int total_frame_count = pThis->current_data->size() / pThis->byte_per_sample / pThis->spec.channelCount;
   int played_frame_count = pThis->audio_index / pThis->byte_per_sample / pThis->spec.channelCount;
@@ -433,7 +435,7 @@ int SongSession::fill_audio(const void *inbuf, void *outbuf, unsigned long frame
     return paComplete;
   }
 
-  int frame_to_copy = FFMIN(frames_per_buf, frame_left);
+  int frame_to_copy = FFMIN((int)frames_per_buf, frame_left);
   int byte_to_copy = frame_to_copy * pThis->byte_per_sample * pThis->spec.channelCount;
 
   memcpy(outbuf, pThis->current_data->c_str() + pThis->audio_index, byte_to_copy);
@@ -455,7 +457,7 @@ void SongSession::convertSamplingRate(std::string &src, std::string &dst, uint32
   }
 }
 
-void SongSession::convertBitdepth(std::string &src, std::string &dst, uint32_t src_bits, uint32_t dst_bits, uint32_t channel) {
+void SongSession::convertBitdepth(std::string &src, std::string &dst, uint32_t src_bits, uint32_t dst_bits) {
   uint32_t count = src.size();
   uint32_t dst_samplesize = dst_bits >> 3;
   uint32_t src_samplesize = src_bits >> 3;

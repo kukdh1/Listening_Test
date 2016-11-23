@@ -70,7 +70,7 @@ class SongSession {
     uint32_t sampleToMs(uint32_t);
 
     static void convertSamplingRate(std::string &, std::string &, uint32_t, uint32_t, uint32_t);
-    static void convertBitdepth(std::string &, std::string &, uint32_t, uint32_t, uint32_t);
+    static void convertBitdepth(std::string &, std::string &, uint32_t, uint32_t);
 
   public:
     SongSession(AudioSystem *);
