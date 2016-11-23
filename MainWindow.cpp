@@ -146,7 +146,8 @@ MainWindow::MainWindow(QWidget *parent)
       session->getTestInfo(testtype, factorH, factorL);
       
       QString filename = songModel.getItem(ui.fileTableView->selectionModel()->selectedRows().at(0).row()).getData(0);
-      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, true, factorH, factorL, QString());
+      QString empty;
+      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, true, factorH, factorL, empty);
 
       resultModel.appendResult(item);
 
@@ -201,8 +202,8 @@ MainWindow::MainWindow(QWidget *parent)
       session->getTestInfo(testtype, factorH, factorL);
       
       QString filename = songModel.getItem(ui.fileTableView->selectionModel()->selectedRows().at(0).row()).getData(0);
-      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, false, factorH, factorL, QString());
-
+      QString empty;
+      Result item(filename, testtype ? Result::TEST_SAMPLINGRATE : Result::TEST_BITDEPTH, answer, true, factorH, factorL, empty);
       resultModel.appendResult(item);
 
       session->stopPlaying();
