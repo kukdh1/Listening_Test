@@ -81,7 +81,7 @@ QString Result::getData(int idx) const {
     case 3:
       return bFirstSoundIsBetter ? STRING_TEST_FIRST : STRING_TEST_SECOND;
     case 4:
-      return bFirstSoundIsBetter ? STRING_TEST_FIRST : STRING_TEST_SECOND;
+      return bUserSelectFirstSound ? STRING_TEST_FIRST : STRING_TEST_SECOND;
     case 5:
       return memo;
   }
