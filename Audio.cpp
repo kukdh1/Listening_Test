@@ -140,28 +140,36 @@ bool SongSession::setTestInfo(std::string hqFactor, std::string lqFactor) {
 }
 
 void SongSession::sineWaveTest() {
+  int time = 2;
+  int freq = 48000;
+  
   // Create sine wave (1sec)
   current_freq = 192000;
   memset(&spec, 0, sizeof(PaStreamParameters));
   spec.device = Pa_GetDefaultOutputDevice();
   spec.channelCount = 1;
   spec.suggestedLatency = Pa_GetDeviceInfo(spec.device)->defaultLowOutputLatency;
-  spec.sampleFormat = paUInt8;
+  spec.sampleFormat = paInt16;
   current_data = &data_original;
-  byte_per_sample = 1;
-  uint32_t buffersize = current_freq * spec.channelCount / 10;
+  byte_per_sample = 2;
+  uint32_t length = current_freq * spec.channelCount * byte_per_sample;
+  uint32_t buffersize = length / 10;
+  
+  length *= time;
 
   // Create buffer
-  data_original.resize(current_freq);
+  data_original.resize(length);
 
-  for (uint32_t i = 0; i < current_freq; i++) {
-    data_original.at(i) = i % 2 ? 0x40 : 0xC0;
+  for (uint32_t i = 0; i < length; i += byte_per_sample) {
+    int16_t sample = 0x7FFF * cosf(2 * 3.1415926f * freq * i / byte_per_sample / current_freq);
+    
+    memcpy((char *)data_original.c_str() + i, &sample, byte_per_sample);
   }
 
   // Play sinewave for 1 sec
   if (Pa_OpenStream(&current_stream, NULL, &spec, current_freq, buffersize, paClipOff, fill_audio, this) == paNoError) {
     Pa_StartStream(current_stream);
-    Pa_Sleep(1000);
+    Pa_Sleep(1000 * time);
     Pa_StopStream(current_stream);
     Pa_CloseStream(current_stream);
     current_stream = NULL;
