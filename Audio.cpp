@@ -139,9 +139,8 @@ bool SongSession::setTestInfo(std::string hqFactor, std::string lqFactor) {
   return uiFactorHQ > uiFactorLQ;
 }
 
-void SongSession::sineWaveTest() {
+void SongSession::sineWaveTest(int targetFrequency) {
   int time = 2;
-  int freq = 48000;
   
   // Create sine wave (1sec)
   current_freq = 192000;
@@ -161,7 +160,7 @@ void SongSession::sineWaveTest() {
   data_original.resize(length);
 
   for (uint32_t i = 0; i < length; i += byte_per_sample) {
-    int16_t sample = 0x7FFF * cosf(2 * 3.1415926f * freq * i / byte_per_sample / current_freq);
+    int16_t sample = 0x7FFF * cosf(2 * 3.1415926f * targetFrequency * i / byte_per_sample / current_freq);
     
     memcpy((char *)data_original.c_str() + i, &sample, byte_per_sample);
   }

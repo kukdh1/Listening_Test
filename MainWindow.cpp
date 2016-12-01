@@ -277,9 +277,13 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui.sineWaveButton, &QPushButton::clicked, [&]() {
     if (!session) {
+      int freq = 0;
+
       session = new SongSession(&audio);
 
-      session->sineWaveTest();
+      freq = ui.freqInputBox->value();
+
+      session->sineWaveTest(freq);
 
       SAFE_DELETE(session);
     }

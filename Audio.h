@@ -84,7 +84,7 @@ class SongSession {
     bool setTestType(std::string);
     bool setTestInfo(std::string, std::string);
   
-    void sineWaveTest();
+    void sineWaveTest(int);
 
     bool openSound(const char *);
     bool readSound();
